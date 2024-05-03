@@ -2,13 +2,14 @@
   "name": "backend-bmwarehouse",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
+  "main": "src/server.js",
   "scripts": {
     "prettier:check": "prettier --check \"src/**/*.js\"",
     "prettier:format": "prettier --write \"src/**/*.js\"",
     "lint": "eslint \"src/**/*.js\" --fix",
     "lint:check": "eslint \"src/**/*.js\"",
-    "prepare:husky": "husky install"
+    "prepare:husky": "husky install",
+    "start": "nodemon server.js"
   },
   "author": "BM-WAREHOUSE RAKAMIN",
   "license": "ISC",
