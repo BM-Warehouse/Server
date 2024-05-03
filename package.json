@@ -4,9 +4,13 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prettier:check": "prettier --check \"src/**/*.js\"",
+    "prettier:format": "prettier --write \"src/**/*.js\"",
+    "lint": "eslint \"src/**/*.js\" --fix",
+    "lint:check": "eslint \"src/**/*.js\"",
+    "prepare:husky": "husky install"
   },
-  "author": "",
+  "author": "BM-WAREHOUSE RAKAMIN",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.13.0",
@@ -21,6 +25,20 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
-    "@commitlint/config-conventional": "^19.2.2"
+    "@commitlint/config-conventional": "^19.2.2",
+    "eslint": "8.49.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-config-standard": "17.1.0",
+    "eslint-plugin-import": "2.28.1",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "6.1.1",
+    "husky": "^9.0.11",
+    "lint-staged": "15.2.2",
+    "prettier": "^3.2.5"
+  },
+  "engines": {
+    "npm": "please-use-pnpm",
+    "node": ">=17.x.x",
+    "pnpm": ">=8"
   }
 }
