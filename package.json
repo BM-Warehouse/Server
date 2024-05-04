@@ -20,6 +20,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.13",
     "prisma": "^5.13.0"
@@ -41,5 +42,18 @@
     "npm": "please-use-pnpm",
     "node": ">=17.x.x",
     "pnpm": ">=8"
+  },
+  "_moduleAliases": {
+    "@src": "./src",
+    "@controllers": "./src/controllers",
+    "@constants": "./src/constants",
+    "@exceptions": "./src/exceptions",
+    "@libs": "./src/libs",
+    "@middlewares": "./src/middlewares",
+    "@services": "./src/services",
+    "@routes": "./src/routes"
+  },
+  "prisma": {
+    "seed": "node ./prisma/seeds/index.js"
   }
 }
