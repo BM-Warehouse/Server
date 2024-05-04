@@ -12,3 +12,161 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String?
+  password  String
+  fullName  String?
+  phone     String?
+  address   String?
+  gender    String?
+  birthdate DateTime
+  avatar    String?
+  role      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart     Cart?
+  checkout Checkout[]
+}
+
+model Cart {
+  id Int @id @default(autoincrement())
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int   @unique //untuk one to one perlu dikasih unique gini
+
+  totalPrice Int?
+  status     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  products ProductCart[]
+}
+
+model Checkout {
+  id Int @id @default(autoincrement())
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?
+
+  totalPrice Int?
+  status     String?  @default("sedang dikemas")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  productCheckout ProductCheckout[]
+}
+
+model ProductCheckout {
+  id Int @id @default(autoincrement())
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  checkout   Checkout @relation(fields: [checkoutId], references: [id])
+  checkoutId Int
+
+  quantityItem Int?
+  productPrice Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String?
+  description String?
+  totalStock  Int?
+  price       Int?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // kita bisa pikir ini sebagai tabel Product dijadikan referensi oleh table dibawah (ProductCheckout, ProductWarehouse, ProductCategory, ProductCart, dan Batch)
+  productCheckouts  ProductCheckout[]
+  productWarehouses ProductWarehouse[]
+  productCategories ProductCategory[]
+  productCarts      ProductCart[]
+  batches           Batch[]
+}
+
+model ProductCategory {
+  id Int @id @default(autoincrement())
+
+  // kita bisa pikir ini sebagai bahwa "productId" ambil referensi dari tabel "Product" di kolom "id"
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  // kita bisa pikir ini sebagai bahwa "categoryId" ambil referensi dari tabel "Category" di kolom "id"
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductWarehouse {
+  id Int @id @default(autoincrement())
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouseId Int
+
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Warehouse {
+  id        Int      @id @default(autoincrement())
+  name      String
+  address   String?
+  city      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productsWarehouses ProductWarehouse[]
+  batches            Batch[]
+}
+
+model Batch {
+  id        Int     @id @default(autoincrement())
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouseId Int
+
+  batchName  String?
+  stock      Int
+  expireDate DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Category {
+  id                Int               @id @default(autoincrement())
+  name              String?
+  description       String?
+  imageUrl          String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  productCategories ProductCategory[]
+}
+
+model ProductCart {
+  id           Int      @id @default(autoincrement())
+  quantityItem Int?
+  productPrice Int?
+  product      Product  @relation(fields: [productId], references: [id])
+  productId    Int
+  cart         Cart     @relation(fields: [cartId], references: [id])
+  cartId       Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
