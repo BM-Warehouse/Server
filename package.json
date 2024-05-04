@@ -50,7 +50,8 @@
     "@exceptions": "./src/exceptions",
     "@libs": "./src/libs",
     "@middlewares": "./src/middlewares",
-    "@services": "./src/services"
+    "@services": "./src/services",
+    "@routes": "./src/routes"
   },
   "prisma": {
     "seed": "node ./prisma/seeds/index.js"
