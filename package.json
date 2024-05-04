@@ -51,5 +51,8 @@
     "@libs": "./src/libs",
     "@middlewares": "./src/middlewares",
     "@services": "./src/services"
+  },
+  "prisma": {
+    "seed": "node ./prisma/seeds/index.js"
   }
 }
