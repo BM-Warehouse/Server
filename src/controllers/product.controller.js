@@ -9,6 +9,16 @@ class ProductController {
       next(e);
     }
   }
+
+  static async getProductDetail(req, res, next) {
+    try {
+      const id = req.params.id;
+      const product = await ProductService.getProductDetail(id);
+      res.status(200).json(product);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = ProductController;
