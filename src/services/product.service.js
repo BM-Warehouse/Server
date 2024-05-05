@@ -1,8 +1,11 @@
 const prisma = require('@libs/prisma');
 
 class ProductService {
-  static async getAllProducts() {
-    const products = await prisma.product.findMany();
+  static async getAllProducts({ page, limit }) {
+    const products = await prisma.product.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
 
     return products;
   }

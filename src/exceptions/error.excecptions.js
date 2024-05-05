@@ -21,4 +21,20 @@ class ClientError {
   }
 }
 
-module.exports = ClientError;
+class BadRequest extends ClientError {
+  constructor(message, detail = undefined) {
+    super(message, errorType.BAD_REQUEST, 400, detail);
+  }
+}
+
+class InternalServerError extends ClientError {
+  constructor(message, detail = undefined) {
+    super(message, errorType.INTERNAL_SERVER_ERROR, 500, detail);
+  }
+}
+
+module.exports = {
+  ClientError,
+  BadRequest,
+  InternalServerError,
+};

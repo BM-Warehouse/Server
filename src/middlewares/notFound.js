@@ -1,4 +1,4 @@
-const ClientError = require('@exceptions/clientError');
+const { ClientError } = require('@exceptions/error.excecptions');
 const errorType = require('@constants/errorType');
 
 function notFound(req, res, next) {

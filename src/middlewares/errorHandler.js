@@ -1,6 +1,6 @@
-const ClientError = require('@src/exceptions/clientError');
+const { ClientError } = require('@src/exceptions/error.excecptions');
 
-function errorHandler(err, res, next) {
+function errorHandler(err, req, res, next) {
   if (err instanceof ClientError) {
     res.status(err.statusCode).json(err.getObject());
   } else next();
