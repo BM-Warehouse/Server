@@ -17,12 +17,7 @@
     "es2021": true
   },
   "rules": {
-    "import/no-unresolved": "off",
-    "import/extensions": "off",
-    "import/no-extraneous-dependencies": "off",
-    "class-methods-use-this": "off",
-    "no-underscore-dangle": "off",
-    "no-shadow": "off",
+    "no-console":"warn",
     "max-len": [
       "error",
       100
