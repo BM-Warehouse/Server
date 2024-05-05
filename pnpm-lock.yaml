@@ -54,9 +54,9 @@ importers:
       eslint-config-standard:
         specifier: 17.1.0
         version: 17.1.0(eslint-plugin-import@2.28.1(eslint@8.49.0))(eslint-plugin-n@16.6.2(eslint@8.49.0))(eslint-plugin-promise@6.1.1(eslint@8.49.0))(eslint@8.49.0)
-      eslint-plugin-import:
-        specifier: 2.28.1
-        version: 2.28.1(eslint@8.49.0)
+      eslint-plugin:
+        specifier: ^1.0.1
+        version: 1.0.1
       eslint-plugin-node:
         specifier: 11.1.0
         version: 11.1.0(eslint@8.49.0)
@@ -66,6 +66,9 @@ importers:
       husky:
         specifier: ^9.0.11
         version: 9.0.11
+      import:
+        specifier: ^0.0.6
+        version: 0.0.6
       lint-staged:
         specifier: 15.2.2
         version: 15.2.2
@@ -737,6 +740,10 @@ packages:
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0
 
+  eslint-plugin@1.0.1:
+    resolution: {integrity: sha512-ervp8C09On0fLA258TvE08AqAr/bhRYgHVZd3BrJjD4JfOA2JGANDLGs06j51oWqfPd7Feoo3OoqHD+fuI2sFQ==}
+    engines: {node: '>=0.10.0'}
+
   eslint-scope@7.2.2:
     resolution: {integrity: sha512-dOt21O7lTMhDM+X9mB4GX+DZrZtCUJPL/wlcTqxyrx5IvO0IYtILdtrQGQp+8n5S0gwSVmOf9NQrjMOgfQZlIg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -985,6 +992,11 @@ packages:
 
   import-meta-resolve@4.1.0:
     resolution: {integrity: sha512-I6fiaX09Xivtk+THaMfAwnA3MVA5Big1WHF1Dfx9hFuvNIWpXnorlkzhcQf6ehrqQiiZECRt1poOAkPmer3ruw==}
+
+  import@0.0.6:
+    resolution: {integrity: sha512-QPhTdjy9J4wUzmWSG7APkSgMFuPGPw+iJTYUblcfc2AfpqaatbwgCldK1HoLYx+v/+lWvab63GWZtNkcnj9JcQ==}
+    engines: {node: '>=0.10.0'}
+    hasBin: true
 
   imurmurhash@0.1.4:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
@@ -1416,6 +1428,9 @@ packages:
     resolution: {integrity: sha512-1FlR+gjXK7X+AsAHso35MnyN5KqGwJRi/31ft6x0M194ht7S+rWAvd7PHss9xSKMzE0asv1pyIHaJYq+BbacAQ==}
     engines: {node: '>=12'}
 
+  optimist@0.3.7:
+    resolution: {integrity: sha512-TCx0dXQzVtSCg2OgY/bO9hjM9cV4XYx09TVK+s3+FhkjT6LovsLe+pPMzpWf+6yXK/hUizs2gUoTw3jHM0VaTQ==}
+
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
@@ -1552,6 +1567,10 @@ packages:
   require-from-string@2.0.2:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
+
+  requireindex@1.1.0:
+    resolution: {integrity: sha512-LBnkqsDE7BZKvqylbmn7lTIVdpx4K/QCduRATpO5R+wtPmky/a8pN1bO2D6wXppn1497AJF9mNjqAXr6bdl9jg==}
+    engines: {node: '>=0.10.5'}
 
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
@@ -1850,6 +1869,10 @@ packages:
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
+
+  wordwrap@0.0.3:
+    resolution: {integrity: sha512-1tMA907+V4QmxV7dbRvb4/8MaRALK6q9Abid3ndMYnbyo8piisCmeONVqVSXqQA3KaP4SLt5b7ud6E2sqP8TFw==}
+    engines: {node: '>=0.4.0'}
 
   wrap-ansi@7.0.0:
     resolution: {integrity: sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==}
@@ -2687,6 +2710,10 @@ snapshots:
     dependencies:
       eslint: 8.49.0
 
+  eslint-plugin@1.0.1:
+    dependencies:
+      requireindex: 1.1.0
+
   eslint-scope@7.2.2:
     dependencies:
       esrecurse: 4.3.0
@@ -3017,6 +3044,10 @@ snapshots:
       resolve-from: 4.0.0
 
   import-meta-resolve@4.1.0: {}
+
+  import@0.0.6:
+    dependencies:
+      optimist: 0.3.7
 
   imurmurhash@0.1.4: {}
 
@@ -3416,6 +3447,10 @@ snapshots:
     dependencies:
       mimic-fn: 4.0.0
 
+  optimist@0.3.7:
+    dependencies:
+      wordwrap: 0.0.3
+
   optionator@0.9.4:
     dependencies:
       deep-is: 0.1.4
@@ -3536,6 +3571,8 @@ snapshots:
   require-directory@2.1.1: {}
 
   require-from-string@2.0.2: {}
+
+  requireindex@1.1.0: {}
 
   resolve-from@4.0.0: {}
 
@@ -3868,6 +3905,8 @@ snapshots:
       string-width: 4.2.3
 
   word-wrap@1.2.5: {}
+
+  wordwrap@0.0.3: {}
 
   wrap-ansi@7.0.0:
     dependencies:

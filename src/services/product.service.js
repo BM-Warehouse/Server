@@ -1,11 +1,11 @@
-const prisma = require("@libs/prisma");
+const prisma = require('@libs/prisma');
 
 class ProductService {
-    static async getAllProducts() {
-        const products = await prisma.product.findMany();
+  static async getAllProducts() {
+    const products = await prisma.product.findMany();
 
-        return products;
-    }
+    return products;
+  }
 }
 
 module.exports = ProductService;
