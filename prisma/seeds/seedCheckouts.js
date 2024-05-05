@@ -1,16 +1,16 @@
 const prisma = require('@src/libs/prisma');
 
 const checkouts = [
-  { userId: 1, totalPrice: 1, status: "<script>alert('hi')</script>" },
-  { userId: 2, totalPrice: 2, status: '울란바토르' },
-  { userId: 3, totalPrice: 3, status: '👩🏽' },
-  { userId: 4, totalPrice: 4, status: '1E02' },
-  { userId: 5, totalPrice: 5, status: 'ÅÍÎÏ˝ÓÔÒÚÆ☃' },
-  { userId: 6, totalPrice: 6, status: "'" },
-  { userId: 7, totalPrice: 7, status: '⁰⁴⁵₀₁₂' },
-  { userId: 8, totalPrice: 8, status: "\"'\"'\"''''\"" },
-  { userId: 9, totalPrice: 9, status: '-$1.00' },
-  { userId: 10, totalPrice: 10, status: '¡™£¢∞§¶•ªº–≠' },
+  { userId: 1, totalPrice: 100000, status: 'Delivered' },
+  { userId: 2, totalPrice: 200000, status: 'Packing' },
+  { userId: 3, totalPrice: 300000, status: 'Packing' },
+  { userId: 4, totalPrice: 400000, status: 'Packing' },
+  { userId: 5, totalPrice: 500000, status: 'Delivering' },
+  { userId: 6, totalPrice: 600000, status: "Delivering" },
+  { userId: 7, totalPrice: 700000, status: 'Packing' },
+  { userId: 8, totalPrice: 800000, status: 'Delivered' },
+  { userId: 9, totalPrice: 900000, status: 'Packing' },
+  { userId: 10, totalPrice: 1000000, status: 'Delivered' },
 ];
 
 async function seedCheckouts() {
