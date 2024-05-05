@@ -33,8 +33,15 @@ class InternalServerError extends ClientError {
   }
 }
 
+class NotFoundError extends ClientError {
+  constructor(message, detail = undefined) {
+    super(message, errorType.NOT_FOUND, 404, detail);
+  }
+}
+
 module.exports = {
   ClientError,
   BadRequest,
   InternalServerError,
+  NotFoundError,
 };
