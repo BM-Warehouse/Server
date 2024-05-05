@@ -2,7 +2,6 @@ const prisma = require('@libs/prisma');
 
 const users = [
   {
-    id: 1,
     email: 'mposselow0@slideshare.net',
     username: 'mposselow0',
     password: 'cC8"=6!u',
@@ -15,7 +14,6 @@ const users = [
     role: 'Estimator',
   },
   {
-    id: 2,
     email: 'cmottram1@friendfeed.com',
     username: 'cmottram1',
     password: 'cT4~.\\#9x+B(Pc)|',
@@ -28,7 +26,6 @@ const users = [
     role: 'Construction Worker',
   },
   {
-    id: 3,
     email: 'bnan2@digg.com',
     username: 'bnan2',
     password: 'zY9}pa?n,.`',
@@ -41,7 +38,6 @@ const users = [
     role: 'Subcontractor',
   },
   {
-    id: 4,
     email: 'jperigeaux3@wiley.com',
     username: 'jperigeaux3',
     password: 'bY7~fzzU7c',
@@ -54,7 +50,6 @@ const users = [
     role: 'Surveyor',
   },
   {
-    id: 5,
     email: 'bbraddon4@biblegateway.com',
     username: 'bbraddon4',
     password: 'jB8<S&R.Qs<xF',
@@ -67,7 +62,6 @@ const users = [
     role: 'Architect',
   },
   {
-    id: 6,
     email: 'nruckert5@prweb.com',
     username: 'nruckert5',
     password: 'nM8&g~9V',
@@ -80,7 +74,6 @@ const users = [
     role: 'Electrician',
   },
   {
-    id: 7,
     email: 'bmatyja6@360.cn',
     username: 'bmatyja6',
     password: 'rS3)7qg0~Fmc',
@@ -93,7 +86,6 @@ const users = [
     role: 'Supervisor',
   },
   {
-    id: 8,
     email: 'brieme7@home.pl',
     username: 'brieme7',
     password: 'jD0)W4+sL$',
@@ -106,7 +98,6 @@ const users = [
     role: 'Engineer',
   },
   {
-    id: 9,
     email: 'lkingsman8@tumblr.com',
     username: 'lkingsman8',
     password: 'nU2`+&,&VRjW"',
@@ -119,7 +110,6 @@ const users = [
     role: 'Electrician',
   },
   {
-    id: 10,
     email: 'ggibke9@ted.com',
     username: 'ggibke9',
     password: 'oQ5$<iQF8~Wr\\',
