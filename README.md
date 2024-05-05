@@ -7,8 +7,7 @@
 5. Run `pnpm install` in project directory to install all the dependencies
 6. Run `pnpm prepare:husky`
 7. Run `pnpm prisma:migrate`
-8. Run `pnpm prisma:seed` for seeding the database with dummy data
-9. Run `pnpm start` to start the website in your local machine
+8. Run `pnpm start` to start the website in your local machine
 
 ## How to see database
 
