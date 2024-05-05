@@ -7,22 +7,42 @@ const {
 
 class ProductService {
   static async getAll({ page, limit }) {
-    const products = await prisma.product.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    try {
+      const products = await prisma.product.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+      });
 
-    return products;
+      return products;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to delete Product to db', e);
+      } else {
+        throw e;
+      }
+    }
   }
 
   static async getDetail(id) {
-    const products = await prisma.product.findFirst({
-      where: {
-        id: +id,
-      },
-    });
+    try {
+      const products = await prisma.product.findFirst({
+        where: {
+          id: +id,
+        },
+      });
 
-    return products;
+      if (!products) {
+        throw new NotFoundError('No product found', `There is no product with id ${id}`);
+      }
+
+      return products;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to get detail of product', e);
+      } else {
+        throw e;
+      }
+    }
   }
 
   static async add(payload) {
@@ -33,14 +53,24 @@ class ProductService {
       });
       return product;
     } catch (e) {
-      throw new InternalServerError('Fail to Add Product to db');
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to delete Product to db', e);
+      } else {
+        throw e;
+      }
     }
   }
 
   static async edit(payload) {
     try {
       const { id, name, description, totalStock, price, imageUrl } = payload;
-      const product = await prisma.product.update({
+
+      let product = await this.getDetail(id);
+      if (!product) {
+        throw new NotFoundError('No product found', `There is no product with id ${id}`);
+      }
+
+      product = await prisma.product.update({
         data: {
           name,
           description,
@@ -54,7 +84,11 @@ class ProductService {
       });
       return product;
     } catch (e) {
-      throw new InternalServerError('Fail to edit Product to db', e);
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to delete Product to db', e);
+      } else {
+        throw e;
+      }
     }
   }
 
