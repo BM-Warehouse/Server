@@ -41,7 +41,7 @@
   },
   "engines": {
     "npm": "please-use-pnpm",
-    "node": ">=17.x.x",
+    "node": ">=20.x.x",
     "pnpm": ">=8"
   },
   "_moduleAliases": {
