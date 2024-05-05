@@ -6,6 +6,16 @@ class ProductService {
 
     return products;
   }
+
+  static async getProductDetail(id) {
+    const products = await prisma.product.findFirst({
+      where: {
+        id: +id,
+      },
+    });
+
+    return products;
+  }
 }
 
 module.exports = ProductService;
