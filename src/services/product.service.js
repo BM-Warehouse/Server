@@ -3,6 +3,8 @@ const {
   InternalServerError,
   ClientError,
   NotFoundError,
+  BadRequest,
+  ConflictError,
 } = require('@exceptions/error.excecptions');
 
 class ProductService {
@@ -48,13 +50,30 @@ class ProductService {
   static async add(payload) {
     try {
       const data = payload;
-      const product = await prisma.product.create({
+      if (!data.name || !data.price) {
+        throw new BadRequest('Invalid body parameter', 'name and price cannot be empty!');
+      }
+
+      let product = await prisma.product.findFirst({
+        where: {
+          name: data.name,
+        },
+      });
+
+      if (product) {
+        throw new ConflictError(
+          'Data conflict of product',
+          `The product with name '${data.name}' has been available!`,
+        );
+      }
+
+      product = await prisma.product.create({
         data,
       });
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e);
+        throw new InternalServerError('Fail to add Product to db', e);
       } else {
         throw e;
       }

@@ -39,9 +39,16 @@ class NotFoundError extends ClientError {
   }
 }
 
+class ConflictError extends ClientError {
+  constructor(message, detail = undefined) {
+    super(message, errorType.CONFLICT, 409, detail);
+  }
+}
+
 module.exports = {
   ClientError,
   BadRequest,
   InternalServerError,
   NotFoundError,
+  ConflictError,
 };
