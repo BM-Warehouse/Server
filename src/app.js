@@ -11,6 +11,8 @@ const routes = require('@routes/index');
 
 const app = express();
 
+app.use(express.json());
+
 // ping server
 app.get('/', async (req, res, next) => {
   try {
