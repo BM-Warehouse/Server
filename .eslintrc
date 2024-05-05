@@ -23,6 +23,7 @@
     "class-methods-use-this": "off",
     "no-underscore-dangle": "off",
     "no-shadow": "off",
+    "no-console":"warn",
     "max-len": [
       "error",
       100
