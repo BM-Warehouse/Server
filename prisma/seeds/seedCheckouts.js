@@ -10,7 +10,7 @@ const checkouts = [
   { userId: 7, totalPrice: 7, status: '⁰⁴⁵₀₁₂' },
   { userId: 8, totalPrice: 8, status: "\"'\"'\"''''\"" },
   { userId: 9, totalPrice: 9, status: '-$1.00' },
-  { iuserId: 10, totalPrice: 10, status: '¡™£¢∞§¶•ªº–≠' },
+  { userId: 10, totalPrice: 10, status: '¡™£¢∞§¶•ªº–≠' },
 ];
 
 async function seedCheckouts() {
