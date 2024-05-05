@@ -48,17 +48,16 @@ class ProductController {
 
   static async edit(req, res, next) {
     try {
+      const product = await ProductService.edit(req.body);
+      res.status(200).json(successResponse(product, 'Products edited successfully!'));
     } catch (e) {
       next(e);
     }
   }
 
-  static async delete(req, res, next) {
-    try {
-    } catch (e) {
-      next(e);
-    }
-  }
+  // static async delete(req, res, next) {
+
+  // }
 }
 
 module.exports = ProductController;

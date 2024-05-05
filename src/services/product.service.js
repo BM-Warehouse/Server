@@ -34,9 +34,28 @@ class ProductService {
     }
   }
 
-  static async edit(payload) {}
+  static async edit(payload) {
+    try {
+      const { id, name, description, totalStock, price, imageUrl } = payload;
+      const product = await prisma.product.update({
+        data: {
+          name,
+          description,
+          totalStock,
+          price,
+          imageUrl,
+        },
+        where: {
+          id: +id,
+        },
+      });
+      return product;
+    } catch (e) {
+      throw new InternalServerError('Fail to edit Product to db', e);
+    }
+  }
 
-  static async delete(id) {}
+  static async delete() {}
 }
 
 module.exports = ProductService;
