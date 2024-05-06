@@ -21,7 +21,7 @@ jobs:
           port: 22
           script: |
             cd ~/app/BMWAREHOUSE/Server
-            git pull main
+            git pull
             git status
             pnpm install
             pm2 list
