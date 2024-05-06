@@ -22,10 +22,45 @@ class UserController {
 
   static async createUser(req, res, next) {
     try {
-      const { email, password, fullname, phone, address, gender, birthdate, avatar, role } =
-        req.body;
+      const {
+        email,
+        username,
+        password,
+        fullName,
+        phone,
+        address,
+        gender,
+        birthdate,
+        avatar,
+        role,
+      } = req.body;
       const user = await UserService.createUser(
         email,
+        username,
+        password,
+        fullName,
+        phone,
+        address,
+        gender,
+        birthdate,
+        avatar,
+        role,
+      );
+      res.status(201).json({ data: user, message: 'User added succesfully' });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async updateUser(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { username, password, fullname, phone, address, gender, birthdate, avatar, role } =
+        req.body;
+
+      const user = await UserService.updateUser(
+        id,
+        username,
         password,
         fullname,
         phone,
@@ -35,7 +70,17 @@ class UserController {
         avatar,
         role,
       );
-      res.status(201).json({ data: user, message: 'User added succesfully' });
+      res.status(200).json({ data: user, message: 'User updated successfully' });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async destroyUser(req, res, next) {
+    try {
+      const { id } = req.params;
+      await UserService.destroyUser(id);
+      res.status(200).json({ message: 'User deleted successfully' });
     } catch (e) {
       next(e);
     }

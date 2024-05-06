@@ -7,7 +7,7 @@ class UserService {
     return users;
   }
 
-  static async getDetailUser() {
+  static async getDetailUser(id) {
     const user = await prisma.user.findFirst({
       where: {
         id: +id,
@@ -16,21 +16,61 @@ class UserService {
     return user;
   }
 
-  static async createUser() {
+  static async createUser(
+    email,
+    username,
+    password,
+    fullName,
+    phone,
+    address,
+    gender,
+    birthdate,
+    avatar,
+    role,
+  ) {
     const user = await prisma.user.create({
       data: {
-        email,
+        username,
         password,
         fullName,
         phone,
         address,
         gender,
-        birthdate,
+        birthdate: new Date(birthdate),
         avatar,
         role,
       },
     });
     return user;
+  }
+
+  static async updateUser(id, password, fullname, phone, address, gender, birthdate, avatar, role) {
+    const user = await prisma.user.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        email,
+        password,
+        fullname,
+        phone,
+        address,
+        gender,
+        birthdate: new Date(birthdate),
+        avatar,
+        role,
+      },
+    });
+
+    return user;
+  }
+
+  static async destroyUser(id) {
+    await prisma.user.delete({
+      where: {
+        id: +id,
+      },
+    });
   }
 }
 
