@@ -47,9 +47,9 @@ class UserService {
 
   static async updateUser(
     id,
-    email,
+    username,
     password,
-    fullname,
+    fullName,
     phone,
     address,
     gender,
@@ -62,9 +62,9 @@ class UserService {
         id: +id,
       },
       data: {
-        email,
+        username,
         password,
-        fullname,
+        fullName,
         phone,
         address,
         gender,

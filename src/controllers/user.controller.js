@@ -55,14 +55,14 @@ class UserController {
   static async updateUser(req, res, next) {
     try {
       const { id } = req.params;
-      const { username, password, fullname, phone, address, gender, birthdate, avatar, role } =
+      const { username, password, fullName, phone, address, gender, birthdate, avatar, role } =
         req.body;
 
       const user = await UserService.updateUser(
         id,
         username,
         password,
-        fullname,
+        fullName,
         phone,
         address,
         gender,
