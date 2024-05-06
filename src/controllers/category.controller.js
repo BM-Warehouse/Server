@@ -1,4 +1,3 @@
-const { category } = require('@src/libs/prisma');
 const CategoryService = require('@src/services/category.service');
 
 class CategoryController {
