@@ -1,0 +1,27 @@
+name: Deploy to cloud 
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  #======Deploy to cloud with ssh =====
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+        # Connect server cloud with ssh
+      - name: Deploy using ssh
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          script: |
+            cd ~/app/BMWAREHOUSE/Server
+            git pull
+            git status
+            pnpm install
+            pm2 list
