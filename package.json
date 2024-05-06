@@ -53,7 +53,8 @@
     "@libs": "./src/libs",
     "@middlewares": "./src/middlewares",
     "@services": "./src/services",
-    "@routes": "./src/routes"
+    "@routes": "./src/routes",
+    "@responses": "./src/responses"
   },
   "prisma": {
     "seed": "node ./prisma/seeds/index.js"
