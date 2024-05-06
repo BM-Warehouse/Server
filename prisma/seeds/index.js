@@ -6,6 +6,7 @@ const seedUsers = require('./seedUsers');
 const seedCheckouts = require('./seedCheckouts');
 const seedBatches = require('./seedBatches');
 const seedCarts = require('./seedCarts');
+const seedProductCarts = require('./seedProductCarts');
 
 
 async function main() {
@@ -17,6 +18,7 @@ async function main() {
   await seedCheckouts();
   await seedBatches();
   await seedCarts();
+  await seedProductCarts();
 }
 
 main();
