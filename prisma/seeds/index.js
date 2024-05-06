@@ -12,6 +12,7 @@ async function main() {
   await seedWarehouses();
   await seedUsers();
   await seedCheckouts();
+  await seedBatches();
 }
 
 main();
