@@ -1,4 +1,4 @@
-// seed ini harus dijalankan setelah seed produk selesai dilakukan
+// seed ini harus dijalankan setelah seed produk dan batch selesai dilakukan
 const prisma = require('@libs/prisma');
 
 const productWarehouses = [];
@@ -8,12 +8,25 @@ async function generateProductWarehouses() {
     let warehouses = await prisma.warehouse.findMany();
 
     for (const warehouse of warehouses) {
-        shuffleArray(products);
-        const numberOfSelectedProducts = Math.floor(Math.random() * 20) + 5; 
-        const selectedProduct = products.slice(0, numberOfSelectedProducts);
+        for(const product of products){
+            const batches = await prisma.batch.findMany({
+                where: {
+                    warehouseId: warehouse.id,
+                    productId: product.id
+                },
+                select: {
+                    id: true,
+                    productId: true,
+                    warehouseId: true,
+                    stock: true
+                }
+            })
 
-        for (const product of selectedProduct) {
-            const quantity = Math.floor(Math.random() * 1000 + 100);
+            let quantity = 0;
+            for (const batch of batches) {
+                quantity += batch.stock;
+            }
+
             productWarehouses.push({
                 productId: product.id,
                 warehouseId: warehouse.id,
