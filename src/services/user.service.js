@@ -50,7 +50,6 @@ class UserService {
         id: +id,
       },
       data: {
-        email,
         password,
         fullname,
         phone,
