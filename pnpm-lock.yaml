@@ -53,7 +53,7 @@ importers:
         version: 9.0.0(eslint@8.49.0)
       eslint-config-standard:
         specifier: 17.1.0
-        version: 17.1.0(eslint-plugin-import@2.28.1(eslint@8.49.0))(eslint-plugin-n@16.6.2(eslint@8.49.0))(eslint-plugin-promise@6.1.1(eslint@8.49.0))(eslint@8.49.0)
+        version: 17.1.0(eslint-plugin-import@2.29.1)(eslint-plugin-n@16.6.2)(eslint-plugin-promise@6.1.1)(eslint@8.49.0)
       eslint-plugin:
         specifier: ^1.0.1
         version: 1.0.1
@@ -1150,8 +1150,8 @@ packages:
     peerDependencies:
       eslint: '>=4.19.1'
 
-  eslint-plugin-import@2.28.1:
-    resolution: {integrity: sha512-9I9hFlITvOV55alzoKBI+K9q74kv0iKMeY6av5+umsNwayt59fz692daGyjR+oStBQgx6nwR9rXldDev3Clw+A==}
+  eslint-plugin-import@2.29.1:
+    resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
     engines: {node: '>=4'}
     peerDependencies:
       '@typescript-eslint/parser': '*'
@@ -1448,10 +1448,6 @@ packages:
 
   has-unicode@2.0.1:
     resolution: {integrity: sha512-8Rf9Y83NBReMnx0gFzA8JImQACstCYWUplepDa9xprwwtmgEZUF0h/i5xSA625zB/I37EtrswSST6OXxwaaIJQ==}
-
-  has@1.0.4:
-    resolution: {integrity: sha512-qdSAmqLF6209RFj4VVItywPMbm3vWylknmB3nvNiUIs72xAimcM8nVYxYr7ncvZq5qzk9MKIZR8ijqD/1QuYjQ==}
-    engines: {node: '>= 0.4.0'}
 
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
@@ -3036,7 +3032,7 @@ snapshots:
       '@commitlint/types': 19.0.3
       chalk: 5.3.0
       cosmiconfig: 9.0.0(typescript@5.4.5)
-      cosmiconfig-typescript-loader: 5.0.0(@types/node@20.12.8)(cosmiconfig@9.0.0(typescript@5.4.5))(typescript@5.4.5)
+      cosmiconfig-typescript-loader: 5.0.0(@types/node@20.12.8)(cosmiconfig@9.0.0)(typescript@5.4.5)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -3340,7 +3336,7 @@ snapshots:
       fastq: 1.17.1
 
   '@prisma/client@5.13.0(prisma@5.13.0)':
-    optionalDependencies:
+    dependencies:
       prisma: 5.13.0
 
   '@prisma/debug@5.13.0': {}
@@ -3814,7 +3810,7 @@ snapshots:
       object-assign: 4.1.1
       vary: 1.1.2
 
-  cosmiconfig-typescript-loader@5.0.0(@types/node@20.12.8)(cosmiconfig@9.0.0(typescript@5.4.5))(typescript@5.4.5):
+  cosmiconfig-typescript-loader@5.0.0(@types/node@20.12.8)(cosmiconfig@9.0.0)(typescript@5.4.5):
     dependencies:
       '@types/node': 20.12.8
       cosmiconfig: 9.0.0(typescript@5.4.5)
@@ -3827,7 +3823,6 @@ snapshots:
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       parse-json: 5.2.0
-    optionalDependencies:
       typescript: 5.4.5
 
   create-jest@29.7.0(@types/node@20.12.8):
@@ -4050,10 +4045,10 @@ snapshots:
     dependencies:
       eslint: 8.49.0
 
-  eslint-config-standard@17.1.0(eslint-plugin-import@2.28.1(eslint@8.49.0))(eslint-plugin-n@16.6.2(eslint@8.49.0))(eslint-plugin-promise@6.1.1(eslint@8.49.0))(eslint@8.49.0):
+  eslint-config-standard@17.1.0(eslint-plugin-import@2.29.1)(eslint-plugin-n@16.6.2)(eslint-plugin-promise@6.1.1)(eslint@8.49.0):
     dependencies:
       eslint: 8.49.0
-      eslint-plugin-import: 2.28.1(eslint@8.49.0)
+      eslint-plugin-import: 2.29.1(eslint@8.49.0)
       eslint-plugin-n: 16.6.2(eslint@8.49.0)
       eslint-plugin-promise: 6.1.1(eslint@8.49.0)
 
@@ -4068,7 +4063,6 @@ snapshots:
   eslint-module-utils@2.8.1(eslint-import-resolver-node@0.3.9)(eslint@8.49.0):
     dependencies:
       debug: 3.2.7
-    optionalDependencies:
       eslint: 8.49.0
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
@@ -4087,7 +4081,7 @@ snapshots:
       eslint-utils: 2.1.0
       regexpp: 3.2.0
 
-  eslint-plugin-import@2.28.1(eslint@8.49.0):
+  eslint-plugin-import@2.29.1(eslint@8.49.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -4098,7 +4092,7 @@ snapshots:
       eslint: 8.49.0
       eslint-import-resolver-node: 0.3.9
       eslint-module-utils: 2.8.1(eslint-import-resolver-node@0.3.9)(eslint@8.49.0)
-      has: 1.0.4
+      hasown: 2.0.2
       is-core-module: 2.13.1
       is-glob: 4.0.3
       minimatch: 3.1.2
@@ -4497,8 +4491,6 @@ snapshots:
       has-symbols: 1.0.3
 
   has-unicode@2.0.1: {}
-
-  has@1.0.4: {}
 
   hasown@2.0.2:
     dependencies:

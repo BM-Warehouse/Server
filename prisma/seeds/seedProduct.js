@@ -1,6 +1,6 @@
-const prisma = require("@libs/prisma")
+const prisma = require('@libs/prisma');
 
-let products = []
+let products = [];
 
 for (let i = 1; i <= 50; i++) {
     products.push({
@@ -16,7 +16,7 @@ async function seedProducts() {
     try{
         await prisma.product.createMany({
             data: products
-        })
+        });
     } catch(e){
         console.log(e);
     }

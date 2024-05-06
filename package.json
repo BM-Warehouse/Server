@@ -9,6 +9,7 @@
     "lint": "eslint \"src/**/*.js\" --fix",
     "lint:check": "eslint \"src/**/*.js\"",
     "prisma:migrate": "prisma migrate dev",
+    "db-reset": "prisma migrate reset",
     "prepare:husky": "husky install",
     "start": "nodemon server.js",
     "test": "jest"
