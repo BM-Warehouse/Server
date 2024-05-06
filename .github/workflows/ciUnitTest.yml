@@ -7,7 +7,7 @@ on:
 
 jobs:
   # --- Unit Testing API ---------------
-  lint:
+  unitTesting:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
