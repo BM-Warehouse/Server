@@ -6,15 +6,6 @@ class CategoryService {
     return categories;
   }
 
-  static async getDetailCategory(id) {
-    const category = await prisma.category.findFirst({
-      where: {
-        id: +id,
-      },
-    });
-    return category;
-  }
-
   static async addCategory(name, description, imageUrl) {
     await prisma.category.create({
       data: {
@@ -44,6 +35,21 @@ class CategoryService {
         id: +id,
       },
     });
+  }
+
+  static async getProductByCategory() {
+    const products = await prisma.product.findMany({
+      where: {
+        productCategories: {
+          some: {
+            category: {
+              name: 'pendamping asi',
+            },
+          },
+        },
+      },
+    });
+    return products;
   }
 }
 
