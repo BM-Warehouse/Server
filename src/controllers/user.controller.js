@@ -1,3 +1,4 @@
+const { hashPassword } = require('@libs/bcrypt.js');
 const UserService = require('@services/user.service');
 
 class UserController {
@@ -34,10 +35,12 @@ class UserController {
         avatar,
         role,
       } = req.body;
+
+      const hashPass = hashPassword(password);
       const user = await UserService.createUser(
         email,
         username,
-        password,
+        hashPass,
         fullName,
         phone,
         address,
@@ -70,6 +73,7 @@ class UserController {
         avatar,
         role,
       );
+
       res.status(200).json({ data: user, message: 'User updated successfully' });
     } catch (e) {
       next(e);
