@@ -1,4 +1,4 @@
-name: Deployment
+name: check linter
 
 on:
   push:
