@@ -9,7 +9,7 @@ const seedCarts = require('./seedCarts');
 const seedProductCarts = require('./seedProductCarts');
 const seedProductCategories = require('./seedProductCategories');
 const seedProductCheckout = require('./seedProductCheckout');
-
+const seedProductWarehouses = require('./seedProductWarehouses');
 
 async function main() {
   // tambah fungsi seed disini
@@ -23,6 +23,7 @@ async function main() {
   await seedProductCarts();
   await seedProductCategories();
   await seedProductCheckout();
+  await seedProductWarehouses();
 }
 
 main();
