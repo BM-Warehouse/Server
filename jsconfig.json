@@ -1,15 +1,34 @@
 {
   "compilerOptions": {
     "paths": {
-      "@src/*": ["./src/*"],
-      "@constants/*": ["./src/constants/*"],
-      "@controllers/*": ["./src/controllers/*"],
-      "@exceptions/*": ["./src/exceptions/*"],
-      "@libs/*": ["./src/libs/*"],
-      "@middlewares/*": ["./src/middlewares/*"],
-      "@services/*": ["./src/services/*"],
-      "@routes/*": ["./src/routes/*"],
-      "@responses/*": ["./src/responses/*"],
-    }
+      "@src/*": [
+        "./src/*"
+      ],
+      "@constants/*": [
+        "./src/constants/*"
+      ],
+      "@controllers/*": [
+        "./src/controllers/*"
+      ],
+      "@exceptions/*": [
+        "./src/exceptions/*"
+      ],
+      "@libs/*": [
+        "./src/libs/*"
+      ],
+      "@middlewares/*": [
+        "./src/middlewares/*"
+      ],
+      "@services/*": [
+        "./src/services/*"
+      ],
+      "@routes/*": [
+        "./src/routes/*"
+      ],
+      "@responses/*": [
+        "./src/responses/*"
+      ],
+    },
+    "module": "CommonJS"
   }
 }
