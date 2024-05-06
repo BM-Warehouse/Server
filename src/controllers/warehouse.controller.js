@@ -23,10 +23,8 @@ class WarehouseController {
   static async addWarehouse(req, res, next) {
     try {
       const { name, address, city } = req.body;
-      const newWarehouse = await WarehouseService.addWarehouse(name, address, city);
-      res
-        .status(201)
-        .json({ message: 'Added a new warehouse successfully!' }, { data: newWarehouse });
+      await WarehouseService.addWarehouse(name, address, city);
+      res.status(201).json({ message: 'Added a new warehouse successfully!' });
     } catch (e) {
       next(e);
     }
