@@ -30,6 +30,7 @@ class UserService {
   ) {
     const user = await prisma.user.create({
       data: {
+        email,
         username,
         password,
         fullName,
@@ -44,12 +45,24 @@ class UserService {
     return user;
   }
 
-  static async updateUser(id, password, fullname, phone, address, gender, birthdate, avatar, role) {
+  static async updateUser(
+    id,
+    email,
+    password,
+    fullname,
+    phone,
+    address,
+    gender,
+    birthdate,
+    avatar,
+    role,
+  ) {
     const user = await prisma.user.update({
       where: {
         id: +id,
       },
       data: {
+        email,
         password,
         fullname,
         phone,
