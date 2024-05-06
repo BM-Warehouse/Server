@@ -4,6 +4,8 @@ const seedCategories = require('./seedCategories');
 const seedWarehouses = require('./seedWarehouse');
 const seedUsers = require('./seedUsers');
 const seedCheckouts = require('./seedCheckouts');
+const seedBatches = require('./seedBatches');
+
 
 async function main() {
   // tambah fungsi seed disini
@@ -12,6 +14,7 @@ async function main() {
   await seedWarehouses();
   await seedUsers();
   await seedCheckouts();
+  await seedBatches();
 }
 
 main();
