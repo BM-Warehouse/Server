@@ -6,12 +6,25 @@ class CategoryService {
     return categories;
   }
 
-  static async addCategory(name, description, imageUrl) {
+  static async addCategory(categoryName, categoryDescription, productName, productDescription) {
     await prisma.category.create({
       data: {
-        name,
-        description,
-        imageUrl,
+        name: categoryName,
+        description: categoryDescription,
+        imageUrl: `http://www.example.com/product/${Math.floor(Math.random() * 10)}`,
+        productCategories: {
+          create: {
+            product: {
+              create: {
+                name: productName,
+                description: productDescription,
+                totalStock: Math.floor(Math.random() * 100) + 1,
+                price: Math.floor(100 + Math.random() * 900) * 100,
+                imageUrl: `http://www.example.com/product/${Math.floor(Math.random() * 10)}`,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -37,16 +50,26 @@ class CategoryService {
     });
   }
 
-  static async getProductByCategory() {
-    const products = await prisma.product.findMany({
+  static async getIdProduct(categoryId) {
+    const category = await prisma.category.findUnique({
       where: {
+        id: categoryId,
+      },
+      include: {
         productCategories: {
-          some: {
-            category: {
-              name: 'pendamping asi',
-            },
+          select: {
+            productId: true,
           },
         },
+      },
+    });
+    return category;
+  }
+
+  static async getProductByCategory(productId) {
+    const products = await prisma.product.findMany({
+      where: {
+        id: productId,
       },
     });
     return products;
