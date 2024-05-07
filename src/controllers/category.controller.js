@@ -10,20 +10,15 @@ class CategoryController {
     }
   }
 
-  static async getDetailCategory(req, res, next) {
-    try {
-      const { id } = req.params;
-      const category = await CategoryService.getDetailCategory(id);
-      res.status(200).json(category);
-    } catch (e) {
-      next(e);
-    }
-  }
-
   static async addCategory(req, res, next) {
     try {
-      const { name, description, imageUrl } = req.body;
-      await CategoryService.addCategory(name, description, imageUrl);
+      const { categoryName, categoryDescription, productName, productDescription } = req.body;
+      await CategoryService.addCategory(
+        categoryName,
+        categoryDescription,
+        productName,
+        productDescription,
+      );
       res.status(201).json({ message: 'category added successfully' });
     } catch (e) {
       next(e);
@@ -46,6 +41,20 @@ class CategoryController {
       const { id } = req.params;
       await CategoryService.removeCategory(id);
       res.status(200).json({ message: 'Category deleted successfully' });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async getProductsBasedOnCategory(req, res, next) {
+    try {
+      const { id } = req.params;
+      const categoryId = +id;
+      const data = await CategoryService.getIdProduct(categoryId);
+      const productId = data.productCategories[0].productId;
+      const products = await CategoryService.getProductByCategory(productId);
+      const categoryName = data.name;
+      res.status(200).json({ message: 'OK', data: { category: categoryName, products: products } });
     } catch (e) {
       next(e);
     }

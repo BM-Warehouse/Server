@@ -9,7 +9,7 @@ for(let j = 1; j <= 10; j++){ //warehouseId
             productId: i,
             warehouseId: j,
             batchName: `batch${batchId}`,
-            stock:100,
+            stock: Math.floor(Math.random() * 1000) + 100,
             expireDate: new Date('2024-01-01')
         });
     }
@@ -22,7 +22,7 @@ for(let j = 1; j <= 10; j++){ //warehouseId
             productId: i,
             warehouseId: j,
             batchName: `batch${batchId}`,
-            stock:200,
+            stock: Math.floor(Math.random() * 1000) + 100,
             expireDate: new Date('2024-02-01')
         });
     }

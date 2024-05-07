@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 router.get('/', CategoryController.getAllCategories);
 
-router.get('/:id', CategoryController.getDetailCategory);
+router.get('/:id', CategoryController.getProductsBasedOnCategory);
 
 router.post('/', CategoryController.addCategory);
 
