@@ -51,9 +51,9 @@ async function main() {
   await seedProductCarts();
   await seedProductCategories();
   await seedProductCheckout();
-  // await seedProductWarehouses();
+  await seedProductWarehouses();
 
-  // await updateProductStock();
+  await updateProductStock();
 }
 
 main();

@@ -182,49 +182,49 @@ class ProductService {
       }
 
       // -------------- proses --------------- //
-      const upsertProductWarehouse = prisma.productWarehouse.upsert({
-        where: {
-          productId_warehouseId: {
+      prisma.$transaction(async (tx) => {
+        await tx.productWarehouse.upsert({
+          where: {
+            productId_warehouseId: {
+              productId: product.id,
+              warehouseId: warehouse.id,
+            },
+          },
+          update: {
+            quantity: {
+              increment: +payload.quantity,
+            },
+          },
+          create: {
             productId: product.id,
             warehouseId: warehouse.id,
+            quantity: +payload.quantity,
           },
-        },
-        update: {
-          quantity: {
-            increment: +payload.quantity,
+        });
+
+        const expireDate = await this.#generateExpireDateAfter(3);
+        const batchName = `${product.name}_${warehouse.name}_${+new Date()}`;
+        await tx.batch.create({
+          data: {
+            batchName,
+            productId: product.id,
+            warehouseId: warehouse.id,
+            stock: quantity,
+            expireDate,
           },
-        },
-        create: {
-          productId: product.id,
-          warehouseId: warehouse.id,
-          quantity: +payload.quantity,
-        },
-      });
+        });
 
-      const expireDate = await this.#generateExpireDateAfter(3);
-      const batchName = `${product.name}_${warehouse.name}_${+new Date()}`;
-      const generateBatch = prisma.batch.create({
-        data: {
-          batchName,
-          productId: product.id,
-          warehouseId: warehouse.id,
-          stock: quantity,
-          expireDate,
-        },
-      });
-
-      const updateProductTotalStock = prisma.product.update({
-        where: {
-          id: product.id,
-        },
-        data: {
-          totalStock: {
-            increment: quantity,
+        await tx.product.update({
+          where: {
+            id: product.id,
           },
-        },
+          data: {
+            totalStock: {
+              increment: quantity,
+            },
+          },
+        });
       });
-
-      await prisma.$transaction([upsertProductWarehouse, generateBatch, updateProductTotalStock]);
     } catch (e) {
       if (!(e instanceof ClientError)) {
         console.log(e);
