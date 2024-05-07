@@ -3,12 +3,12 @@ const router = require('express').Router();
 
 router.get('/', CategoryController.getAllCategories);
 
+router.get('/:id', CategoryController.getProductsBasedOnCategory);
+
 router.post('/', CategoryController.addCategory);
 
 router.put('/:id', CategoryController.editCategory);
 
 router.delete('/:id', CategoryController.removeCategory);
-
-router.get('/products', CategoryController.getProductByCategory);
 
 module.exports = router;
