@@ -7,6 +7,7 @@ router.post('/', ProductController.add);
 router.put('/:id', ProductController.edit);
 router.delete('/:id', ProductController.delete);
 
-router.post('/warehouse', ProductController.addToWarehouse);
+router.post('/warehouse/add', ProductController.addToWarehouse);
+router.post('/warehouse/move', ProductController.moveWarehouse);
 
 module.exports = router;
