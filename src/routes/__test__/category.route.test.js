@@ -105,17 +105,23 @@ describe('Category API', () => {
   });
 
   // Test to get products by category
-  describe('GET /api/categories/products', () => {
+  describe('GET /api/categories/:id', () => {
     it('should return products by category', async () => {
       // Mock the getProductByCategory method to resolve
       const mockedProducts = Array.from({ length: 5 }, generateRandomData);
+      // eslint-disable-next-line max-len
+      CategoryService.getIdProduct.mockResolvedValue({
+        name: 'CategoryName',
+        productCategories: [{ productId: 123 }],
+      });
       CategoryService.getProductByCategory.mockResolvedValue(mockedProducts);
 
-      const response = await request(app).get('/api/categories/products');
+      const response = await request(app).get('/api/categories/123');
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message', 'OK');
       expect(response.body).toHaveProperty('data');
-      expect(Array.isArray(response.body.data)).toBeTruthy();
+      expect(response.body.data).toHaveProperty('category', 'CategoryName');
+      expect(Array.isArray(response.body.data.products)).toBeTruthy();
     });
 
     it('should return 404 if category not found', async () => {
