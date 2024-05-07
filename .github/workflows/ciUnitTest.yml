@@ -1,4 +1,4 @@
-name: check linter
+name: Unit testing API
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  # --- check lint ---------------
-  lint:
+  # --- Unit Testing API ---------------
+  unitTesting:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,5 +26,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Running test lint
-        run: pnpm lint:check
+      - name: Running unit testing with jest
+        run: pnpm test
