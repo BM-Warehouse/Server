@@ -10,5 +10,4 @@ module.exports = {
     '^@routes/(.*)$': '<rootDir>/src/routes/$1',
     '^@responses/(.*)$': '<rootDir>/src/responses/$1',
   },
-  // You can add other Jest configuration options here as needed
 };

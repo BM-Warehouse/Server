@@ -49,7 +49,7 @@ class UserController {
         avatar,
         role,
       );
-      res.status(201).json({ data: user, message: 'User added succesfully' });
+      res.status(201).json({ data: user, message: 'User added successfully' });
     } catch (e) {
       next(e);
     }

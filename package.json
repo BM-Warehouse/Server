@@ -1,7 +1,7 @@
 {
   "name": "backend-bmwarehouse",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend API for BMWAREHOUSE APP",
   "main": "src/server.js",
   "scripts": {
     "prettier:check": "prettier --check \"src/**/*.js\"",
@@ -12,7 +12,7 @@
     "db-reset": "prisma migrate reset",
     "prepare:husky": "husky install",
     "start": "nodemon server.js",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "author": "BM-WAREHOUSE RAKAMIN",
   "license": "ISC",
@@ -40,6 +40,7 @@
     "husky": "^9.0.11",
     "import": "^0.0.6",
     "jest": "^29.7.0",
+    "jest-html-reporter": "^3.10.2",
     "lint-staged": "15.2.2",
     "prettier": "^3.2.5",
     "supertest": "^7.0.0"
