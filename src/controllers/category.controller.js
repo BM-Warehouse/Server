@@ -12,8 +12,13 @@ class CategoryController {
 
   static async addCategory(req, res, next) {
     try {
-      const { name, description, imageUrl } = req.body;
-      await CategoryService.addCategory(name, description, imageUrl);
+      const { categoryName, categoryDescription, productName, productDescription } = req.body;
+      await CategoryService.addCategory(
+        categoryName,
+        categoryDescription,
+        productName,
+        productDescription,
+      );
       res.status(201).json({ message: 'category added successfully' });
     } catch (e) {
       next(e);
@@ -41,10 +46,15 @@ class CategoryController {
     }
   }
 
-  static async getProductByCategory(req, res, next) {
+  static async getProductsBasedOnCategory(req, res, next) {
     try {
-      const products = await CategoryService.getProductByCategory();
-      res.status(200).json({ message: 'OK', data: products });
+      const { id } = req.params;
+      const categoryId = +id;
+      const data = await CategoryService.getIdProduct(categoryId);
+      const productId = data.productCategories[0].productId;
+      const products = await CategoryService.getProductByCategory(productId);
+      const categoryName = data.name;
+      res.status(200).json({ message: 'OK', data: { category: categoryName, products: products } });
     } catch (e) {
       next(e);
     }
