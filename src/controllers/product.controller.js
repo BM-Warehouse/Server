@@ -63,6 +63,15 @@ class ProductController {
       next(e);
     }
   }
+
+  static async addToWarehouse(req, res, next) {
+    try {
+      const product = await ProductService.addToWarehouse(req.body);
+      res.status(200).json(successResponse(product, 'Product added to warehouse successfully!'));
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = ProductController;

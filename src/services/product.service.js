@@ -31,6 +31,10 @@ class ProductService {
         where: {
           id: +id,
         },
+        include: {
+          productWarehouses: true,
+          productCategories: true,
+        },
       });
 
       if (!products) {
@@ -73,7 +77,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to add Product to db', e);
+        throw new InternalServerError('Fail to add product list to db', e);
       } else {
         throw e;
       }
@@ -127,6 +131,160 @@ class ProductService {
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to delete Product to db', e);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async addToWarehouse(payload) {
+    let transaction = null;
+    try {
+      // ------- validasi request ----------- //
+      // if (!payload.warehouseId || !payload.productId || !payload.quantity) {
+      //   throw new BadRequest('Invalid body parameter',
+      //    'warehouseId, productId, or quantity cannot be empty!');
+      // }
+
+      // const product = await prisma.product.findFirst({
+      //   where: {
+      //     id: payload.productId,
+      //   },
+      // });
+
+      // const warehouse = await prisma.warehouse.findFirst({
+      //   where: {
+      //     id: payload.warehouseId
+      //   }
+      // })
+
+      // if (!product) {
+      //   throw new NotFoundError(
+      //     'No Product Found',
+      //     `The product with id '${payload.productId}' is not available`,
+      //   );
+      // }
+
+      // if (!warehouse) {
+      //   throw new NotFoundError(
+      //     'No warehouse Found',
+      //     `The warehouse with id '${payload.warehouse}' is not available`,
+      //   );
+      // }
+
+      // -------------- proses --------------- //
+      console.log('addToWarehouse', payload);
+      // transaction = await prisma.productWarehouse({
+      //   where:{
+      //     warehouseId: payload.warehouseId,
+      //     productId: payload.productId
+      //   },
+      //   // update: {},
+      //   create: {
+      //     warehouseId: payload.warehouseId,
+      //     productId: payload.productId,
+      //     quantity: 0
+      //   }
+      // })
+
+      const product = await prisma.product.findFirst({
+        where: {
+          name: payload.productName,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      try {
+        transaction = await prisma.product.upsert({
+          where: {
+            name: payload.productName,
+          },
+          update: {
+            productWarehouses: {
+              update: {
+                data: {
+                  quantity: {
+                    increment: +payload.quantity,
+                  },
+                  warehouse: {
+                    connectOrCreate: {
+                      where: {
+                        name: payload.warehouseName,
+                      },
+                      create: {
+                        name: payload.warehouseName,
+                      },
+                    },
+                  },
+                },
+                where: {
+                  productId_warehouseId: {
+                    productId: product.id,
+                    warehouseId: product.id,
+                  },
+                },
+              },
+            },
+          },
+          create: {
+            name: payload.productName,
+            price: 332211,
+            productWarehouses: {
+              create: {
+                quantity: 112233,
+                warehouse: {
+                  connectOrCreate: {
+                    where: {
+                      name: payload.warehouseName,
+                    },
+                    create: {
+                      name: payload.warehouseName,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        console.log(transaction);
+      } catch (e) {
+        console.log(e);
+      }
+
+      // try{
+      //   transaction = await prisma.product.upsert({
+      //     where:{
+      //       name: "test"
+      //     },
+      //     update: {
+      //       description: "yyyyy",
+      //       price: 1234
+      //     },
+      //     create: {
+      //       name: "test",
+      //       description: "xxxxx",
+      //       price:4321
+      //     }
+      //   })
+      // } catch (e) {
+      //   console.log(e)
+      //   throw e
+      // }
+
+      // await prisma.$transaction([
+      //   //create or update productWarehouse table
+
+      // ])
+
+      // console.log(transaction);
+
+      // return product;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to add product to warehouse', e);
       } else {
         throw e;
       }

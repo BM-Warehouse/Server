@@ -62,10 +62,10 @@ model Checkout {
 
 model Product {
   id          Int      @id @default(autoincrement())
-  name        String?
+  name        String    @unique
   description String?
   totalStock  Int?
-  price       Int?
+  price       Int
   imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -80,7 +80,7 @@ model Product {
 
 model Warehouse {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String    @unique
   address   String?
   city      String?
   createdAt DateTime @default(now())
@@ -92,10 +92,10 @@ model Warehouse {
 
 model Batch {
   id        Int     @id @default(autoincrement())
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
 
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
   warehouseId Int
 
   batchName  String?
@@ -116,13 +116,12 @@ model Category {
 }
 
 model ProductCategory {
-
   // kita bisa pikir ini sebagai bahwa "productId" ambil referensi dari tabel "Product" di kolom "id"
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
 
   // kita bisa pikir ini sebagai bahwa "categoryId" ambil referensi dari tabel "Category" di kolom "id"
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
 
   createdAt DateTime @default(now())
@@ -132,11 +131,10 @@ model ProductCategory {
 }
 
 model ProductCheckout {
-
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
 
-  checkout   Checkout @relation(fields: [checkoutId], references: [id])
+  checkout   Checkout @relation(fields: [checkoutId], references: [id], onDelete: Cascade)
   checkoutId Int
 
   quantityItem Int?
@@ -149,10 +147,10 @@ model ProductCheckout {
 
 model ProductWarehouse {
 
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
 
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
   warehouseId Int
 
   quantity  Int
@@ -165,9 +163,9 @@ model ProductWarehouse {
 model ProductCart {
   quantityItem Int?
   productPrice Int?
-  product      Product  @relation(fields: [productId], references: [id])
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId    Int
-  cart         Cart     @relation(fields: [cartId], references: [id])
+  cart         Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   cartId       Int
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
