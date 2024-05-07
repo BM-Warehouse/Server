@@ -1,9 +1,12 @@
 const prisma = require('@src/libs/prisma');
 
 class WarehouseService {
-  static async getAllWarehouses() {
+  static async getAllWarehouses({ page, limit }) {
     try {
-      const warehouses = await prisma.warehouse.findMany();
+      const warehouses = await prisma.warehouse.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+      });
       return warehouses;
     } catch (e) {
       throw new e();

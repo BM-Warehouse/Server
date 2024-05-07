@@ -1,9 +1,20 @@
 const WarehouseService = require('@services/warehouse.service');
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+
 class WarehouseController {
   static async getAllWarehouses(req, res, next) {
     try {
-      const warehouses = await WarehouseService.getAllWarehouses();
+      let { page, limit } = req.query;
+
+      page = +page || DEFAULT_PAGE;
+      limit = +limit || DEFAULT_LIMIT;
+
+      const warehouses = await WarehouseService.getAllWarehouses({
+        page,
+        limit,
+      });
       res.status(200).json(warehouses);
     } catch (e) {
       next(e);
