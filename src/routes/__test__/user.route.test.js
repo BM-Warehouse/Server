@@ -3,9 +3,17 @@ const request = require('supertest');
 const app = require('../../app'); // Atur impor sesuai dengan lokasi berkas aplikasi Anda
 const UserService = require('@services/user.service');
 const { hashPassword } = require('@libs/bcrypt.js');
+const jwt = require('@libs/jwt.js');
+const AuthService = require('@services/auth.service');
 
 // Mock UserService
 jest.mock('@services/user.service');
+
+//Mock the AuthService
+jest.mock('@services/auth.service');
+
+//mock jwt verify token function
+jwt.verifyToken = jest.fn();
 
 describe('User API', () => {
   afterEach(() => {
@@ -76,6 +84,143 @@ describe('User API', () => {
       expect(response.body.data).toHaveProperty('birthdate', newUser.birthdate);
       expect(response.body.data).toHaveProperty('avatar', newUser.avatar);
       expect(response.body.data).toHaveProperty('role', newUser.role);
+    });
+  });
+
+  describe('GET /api/users', () => {
+    it('should get all users', async () => {
+      // Mock the authentication middleware
+      AuthService.findUserById.mockResolvedValueOnce({
+        id: 1,
+        username: 'admin',
+        role: 'admin',
+      });
+
+      // Mock the return value of getAllUsers method
+      UserService.getAllUsers.mockResolvedValueOnce([
+        { id: 1, username: 'user1' },
+        { id: 2, username: 'user2' },
+      ]);
+
+      // Mock token verification
+      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+
+      // Send request with bearer token
+      const response = await request(app)
+        .get('/api/users')
+        .set('Authorization', 'Bearer fakeToken');
+
+      // Assertions
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(2);
+    });
+  });
+
+  describe('GET /api/users/:id', () => {
+    it('should get detail of a user', async () => {
+      // Mock the authentication middleware
+      AuthService.findUserById.mockResolvedValueOnce({
+        id: 1,
+        username: 'admin',
+        role: 'admin',
+      });
+
+      // Mock the return value of getDetailUser method
+      UserService.getDetailUser.mockResolvedValueOnce({ id: 1, username: 'user1' });
+
+      // Mock token verification
+      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+
+      // Send request with bearer token
+      const response = await request(app)
+        .get('/api/users/1')
+        .set('Authorization', 'Bearer fakeToken');
+
+      // Assertions
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('id', 1);
+      expect(response.body).toHaveProperty('username', 'user1');
+    });
+  });
+
+  describe('DELETE /api/users/:id', () => {
+    it('should delete a user', async () => {
+      // Mock the authentication middleware
+      AuthService.findUserById.mockResolvedValueOnce({
+        id: 1,
+        username: 'admin',
+        role: 'admin',
+      });
+
+      // Mock the return value of destroyUser method
+      UserService.destroyUser.mockResolvedValueOnce();
+
+      // Mock token verification
+      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+
+      // Send request with bearer token
+      const response = await request(app)
+        .delete('/api/users/1')
+        .set('Authorization', 'Bearer fakeToken');
+
+      // Assertions
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'User deleted successfully');
+    });
+  });
+
+  describe('PUT /api/users/:id', () => {
+    it('should update a user', async () => {
+      // Mock the authentication middleware
+      AuthService.findUserById.mockResolvedValueOnce({
+        id: 1,
+        username: 'admin',
+        role: 'admin',
+      });
+
+      // Mock the return value of updateUser method
+      UserService.updateUser.mockResolvedValueOnce({
+        id: 1,
+        username: 'updateduser',
+        fullName: 'Updated User',
+        phone: '1234567890',
+        address: '123 Updated St',
+        gender: 'male',
+        birthdate: new Date('1990-01-01'),
+        avatar: 'https://example.com/avatar.jpg',
+        role: 'user',
+      });
+
+      // Mock token verification
+      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+
+      // Send request with bearer token and updated user data
+      const response = await request(app)
+        .put('/api/users/1')
+        .set('Authorization', 'Bearer fakeToken')
+        .send({
+          username: 'updateduser',
+          fullName: 'Updated User',
+          phone: '1234567890',
+          address: '123 Updated St',
+          gender: 'male',
+          birthdate: '1990-01-01',
+          avatar: 'https://example.com/avatar.jpg',
+          role: 'user',
+        });
+
+      // Assertions
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveProperty('id', 1);
+      expect(response.body.data).toHaveProperty('username', 'updateduser');
+      expect(response.body.data).toHaveProperty('fullName', 'Updated User');
+      expect(response.body.data).toHaveProperty('phone', '1234567890');
+      expect(response.body.data).toHaveProperty('address', '123 Updated St');
+      expect(response.body.data).toHaveProperty('gender', 'male');
+      // Menyamakan langsung dengan nilai yang diharapkan
+      expect(response.body.data.birthdate).toEqual('1990-01-01T00:00:00.000Z');
+      expect(response.body.data).toHaveProperty('avatar', 'https://example.com/avatar.jpg');
+      expect(response.body.data).toHaveProperty('role', 'user');
     });
   });
 });
