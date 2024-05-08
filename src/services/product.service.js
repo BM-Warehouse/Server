@@ -98,9 +98,26 @@ class ProductService {
 
   static async edit(payload) {
     try {
-      const { id, name, description, totalStock, price, imageUrl } = payload;
+      const { id, name, description, price, imageUrl } = payload;
 
-      let product = await this.getDetail(id);
+      // ------ validation ----- //
+      let product = await prisma.product.findFirst({
+        where: {
+          name,
+          NOT: {
+            id,
+          },
+        },
+      });
+
+      if (product) {
+        throw new ConflictError(
+          'Product name exist already',
+          `There is a product with name '${name}'`,
+        );
+      }
+
+      product = await this.getDetail(id);
       if (!product) {
         throw new NotFoundError('No product found', `There is no product with id ${id}`);
       }
@@ -109,7 +126,6 @@ class ProductService {
         data: {
           name,
           description,
-          totalStock,
           price,
           imageUrl,
         },
@@ -120,7 +136,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e);
+        throw new InternalServerError('Fail to edit Product to db', e);
       } else {
         throw e;
       }

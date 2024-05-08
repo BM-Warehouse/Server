@@ -6,7 +6,6 @@ const userRoute = require('@routes/user.route');
 const checkoutRoute = require('@routes/checkout.route');
 const warehouseRoute = require('@routes/warehouse.route');
 
-
 /**** Koleksi Route disini *******/
 // router.use('/api', authRoute);
 // router.use(authentication);
