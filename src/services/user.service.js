@@ -1,19 +1,30 @@
 const prisma = require('@libs/prisma');
 
 class UserService {
-  static async getAllUsers() {
-    const users = await prisma.user.findMany();
+  static async getAllUsers({ page, limit }) {
+    try {
+      const users = await prisma.user.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+      });
 
-    return users;
+      return users;
+    } catch (e) {
+      throw new e();
+    }
   }
 
   static async getDetailUser(id) {
-    const user = await prisma.user.findFirst({
-      where: {
-        id: +id,
-      },
-    });
-    return user;
+    try {
+      const user = await prisma.user.findFirst({
+        where: {
+          id: +id,
+        },
+      });
+      return user;
+    } catch (e) {
+      throw new e();
+    }
   }
 
   static async createUser(
@@ -28,21 +39,25 @@ class UserService {
     avatar,
     role,
   ) {
-    const user = await prisma.user.create({
-      data: {
-        email,
-        username,
-        password,
-        fullName,
-        phone,
-        address,
-        gender,
-        birthdate: new Date(birthdate),
-        avatar,
-        role,
-      },
-    });
-    return user;
+    try {
+      const user = await prisma.user.create({
+        data: {
+          email,
+          username,
+          password,
+          fullName,
+          phone,
+          address,
+          gender,
+          birthdate: new Date(birthdate),
+          avatar,
+          role,
+        },
+      });
+      return user;
+    } catch (e) {
+      throw new e();
+    }
   }
 
   static async updateUser(
@@ -57,32 +72,40 @@ class UserService {
     avatar,
     role,
   ) {
-    const user = await prisma.user.update({
-      where: {
-        id: +id,
-      },
-      data: {
-        username,
-        password,
-        fullName,
-        phone,
-        address,
-        gender,
-        birthdate: new Date(birthdate),
-        avatar,
-        role,
-      },
-    });
+    try {
+      const user = await prisma.user.update({
+        where: {
+          id: +id,
+        },
+        data: {
+          username,
+          password,
+          fullName,
+          phone,
+          address,
+          gender,
+          birthdate: new Date(birthdate),
+          avatar,
+          role,
+        },
+      });
 
-    return user;
+      return user;
+    } catch (e) {
+      throw new e();
+    }
   }
 
   static async destroyUser(id) {
-    await prisma.user.delete({
-      where: {
-        id: +id,
-      },
-    });
+    try {
+      await prisma.user.delete({
+        where: {
+          id: +id,
+        },
+      });
+    } catch (e) {
+      throw new e();
+    }
   }
 }
 

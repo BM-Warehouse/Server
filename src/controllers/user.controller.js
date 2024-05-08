@@ -1,10 +1,21 @@
 const { hashPassword } = require('@libs/bcrypt.js');
 const UserService = require('@services/user.service');
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+
 class UserController {
   static async getAllUsers(req, res, next) {
     try {
-      const users = await UserService.getAllUsers();
+      let { page, limit } = req.query;
+
+      page = +page || DEFAULT_PAGE;
+      limit = +limit || DEFAULT_LIMIT;
+
+      const users = await UserService.getAllUsers({
+        page,
+        limit,
+      });
       res.status(200).json(users);
     } catch (e) {
       next(e);
