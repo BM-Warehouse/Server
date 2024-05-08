@@ -431,6 +431,31 @@ class ProductService {
       }
     }
   }
+
+  static async getExpired(filter) {
+    try {
+      let where = {
+        expireDate: {
+          lt: new Date(),
+        },
+      };
+
+      if (filter.warehouseId) where.warehouseId = +filter.warehouseId;
+
+      const batches = await prisma.batch.findMany({
+        where,
+        skip: (filter.page - 1) * filter.limit,
+        take: filter.limit,
+      });
+      return batches;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to get expired product', e);
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = ProductService;

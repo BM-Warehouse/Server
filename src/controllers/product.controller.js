@@ -83,6 +83,31 @@ class ProductController {
       next(e);
     }
   }
+
+  static async getExpired(req, res, next) {
+    try {
+      let { page, limit } = req.query;
+
+      if ((page && isNaN(page)) || (limit && isNaN(limit))) {
+        throw new BadRequest('Query parameter error', 'limit and page have to be a number');
+      }
+
+      page = +page || DEFAULT_PAGE;
+      limit = +limit || DEFAULT_LIMIT;
+
+      let filter = {
+        ...req.query,
+        page,
+        limit,
+      };
+
+      const batches = await ProductService.getExpired(filter);
+
+      res.status(200).json(successResponse(batches, 'Successfully retieve data from batch'));
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = ProductController;
