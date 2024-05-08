@@ -81,7 +81,10 @@ class ProductService {
       }
 
       product = await prisma.product.create({
-        data,
+        data: {
+          ...data,
+          totalStock: 0,
+        },
       });
       return product;
     } catch (e) {
