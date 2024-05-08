@@ -28,7 +28,7 @@ class ProductService {
       return products;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e);
+        throw new InternalServerError('Fail to delete Product to db', e.message);
       } else {
         throw e;
       }
@@ -54,7 +54,7 @@ class ProductService {
       return products;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get detail of product', e);
+        throw new InternalServerError('Fail to get detail of product', e.message);
       } else {
         throw e;
       }
@@ -90,7 +90,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to add product list to db', e);
+        throw new InternalServerError('Fail to add product list to db', e.message);
       } else {
         throw e;
       }
@@ -137,7 +137,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to edit Product to db', e);
+        throw new InternalServerError('Fail to edit Product to db', e.message);
       } else {
         throw e;
       }
@@ -159,7 +159,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e);
+        throw new InternalServerError('Fail to delete Product to db', e.message);
       } else {
         throw e;
       }
@@ -313,7 +313,7 @@ class ProductService {
       });
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to add product to warehouse', e);
+        throw new InternalServerError('Fail to add product to warehouse', e.message);
       } else {
         throw e;
       }
@@ -438,7 +438,7 @@ class ProductService {
       });
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to add product to warehouse', e);
+        throw new InternalServerError('Fail to add product to warehouse', e.message);
       } else {
         throw e;
       }
@@ -451,7 +451,7 @@ class ProductService {
       return batches;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get expired product', e);
+        throw new InternalServerError('Fail to get expired product', e.message);
       } else {
         throw e;
       }
