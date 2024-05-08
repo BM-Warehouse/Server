@@ -1,3 +1,4 @@
+const { successResponse } = require('@src/responses/responses');
 const CartService = require('@src/services/cart.service');
 
 /* eslint-disable no-empty */
@@ -5,11 +6,7 @@ class CartController {
   static async getAllCarts(req, res, next) {
     try {
       const carts = await CartService.getAllCarts();
-      res.status(200).json({
-        status: 'success',
-        message: 'This is the All Carts from All User',
-        data: carts,
-      });
+      res.status(200).json(successResponse({ carts }, 'ok'));
     } catch (e) {
       next(e);
     }
@@ -23,11 +20,7 @@ class CartController {
       // Buat tes, ambil dri query dlu
       const id = +req.query.id;
       const userCart = await CartService.fetchCart(id);
-      res.status(200).json({
-        status: 'success',
-        message: 'This is the Cart',
-        data: userCart,
-      });
+      res.status(200).json(successResponse({ userCart }, 'This is the Cart'));
     } catch (e) {
       next(e);
     }
@@ -47,11 +40,7 @@ class CartController {
       // };
       const payload = req.body;
       const item = await CartService.deleteCartProduct(payload);
-      return res.status(200).json({
-        status: 'success',
-        message: 'Product item deleted successfully',
-        data: item,
-      });
+      res.status(200).json(successResponse(item, 'Product item deleted successfully'));
     } catch (e) {
       next(e);
     }
@@ -62,11 +51,7 @@ class CartController {
       const item = await CartService.resetCartToDefault(+req.query.userId);
 
       // const item = await CartService.resetCartToDefault(+req.user.id);
-      return res.json({
-        status: 'success',
-        message: 'All item on the cart are deleted successfully',
-        data: item,
-      });
+      res.status(200).json(successResponse(item, 'All item on the cart are deleted successfully'));
     } catch (e) {
       next(e);
     }
