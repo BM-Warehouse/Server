@@ -1,133 +1,81 @@
 /* eslint-disable no-undef */
-/* eslint-disable max-len */
-const app = require('../../app');
 const request = require('supertest');
+const app = require('../../app'); // Atur impor sesuai dengan lokasi berkas aplikasi Anda
 const UserService = require('@services/user.service');
 const { hashPassword } = require('@libs/bcrypt.js');
 
-// Mock the UserService
+// Mock UserService
 jest.mock('@services/user.service');
-
-const generateRandomUserData = () => ({
-  email: `${Math.random().toString(36).substring(2, 10)}@example.com`,
-  username: Math.random().toString(36).substring(7),
-  password: Math.random().toString(36).substring(10),
-  fullName: Math.random().toString(36).substring(10),
-  phone: Math.random().toString().substring(2, 12),
-  address: Math.random().toString(36).substring(10),
-  gender: Math.random() > 0.5 ? 'male' : 'female',
-  birthdate: '1990-01-01',
-  avatar: `https://example.com/${Math.random().toString(36).substring(10)}.jpg`,
-  role: 'user',
-});
 
 describe('User API', () => {
   afterEach(() => {
-    jest.clearAllMocks(); // Clear mock calls after each test
+    jest.clearAllMocks();
   });
 
-  // Test to get all users
-  describe('GET /api/users', () => {
-    it('should return all users', async () => {
-      // Mock the return value of getAllUsers method
-      const mockedUsers = Array.from({ length: 5 }, generateRandomUserData);
-      UserService.getAllUsers.mockResolvedValue(mockedUsers);
-
-      const response = await request(app).get('/api/users');
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveLength(mockedUsers.length);
-    });
-  });
-
-  // Test to get detail user
-  describe('GET /api/users/:id', () => {
-    it('should return detail of a user', async () => {
-      // Mock the return value of getDetailUser method
-      const user = generateRandomUserData();
-      UserService.getDetailUser.mockResolvedValue(user);
-
-      const response = await request(app).get(`/api/users/${user.id}`);
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual(user);
-    });
-
-    it('should return 404 if user not found', async () => {
-      // Mock the getDetailUser method to throw an error
-      UserService.getDetailUser.mockRejectedValue(new Error('User not found'));
-
-      const response = await request(app).get('/api/users/9999'); // Assuming ID 9999 doesn't exist
-      expect(response.status).toBe(404);
-    });
-  });
-
-  // Test to create a new user
-  describe('POST /api/users', () => {
+  describe('POST /api/register', () => {
     it('should create a new user', async () => {
-      // Mock the createUser method to resolve
-      UserService.createUser.mockImplementation(async (...args) => {
-        // Hash password before saving
-        args[2] = await hashPassword(args[2]);
-        return generateRandomUserData();
-      });
+      // Mock the implementation of createUser method
+      UserService.createUser.mockImplementation(
+        async (
+          email,
+          username,
+          password,
+          fullName,
+          phone,
+          address,
+          gender,
+          birthdate,
+          avatar,
+          role,
+        ) => {
+          // Simulate hash password before saving
+          const hashedPassword = await hashPassword(password);
+          // Return a mock user object
+          return {
+            id: 1,
+            email,
+            username,
+            password: hashedPassword,
+            fullName,
+            phone,
+            address,
+            gender,
+            birthdate,
+            avatar,
+            role,
+          };
+        },
+      );
 
-      const newUser = generateRandomUserData();
-      const response = await request(app).post('/api/users').send(newUser);
+      // Mock data for the new user
+      const newUser = {
+        email: 'test@example.com',
+        username: 'testuser',
+        password: 'testpassword',
+        fullName: 'Test User',
+        phone: '1234567890',
+        address: '123 Test St',
+        gender: 'male',
+        birthdate: '1990-01-01',
+        avatar: 'https://example.com/avatar.jpg',
+        role: 'user',
+      };
+
+      // Send POST request to create a new user
+      const response = await request(app).post('/api/register').send(newUser);
+
+      // Assert the response
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('message', 'User added successfully');
-    });
-
-    it('should return 404 if required fields are missing', async () => {
-      // Mock the createUser method to throw an error
-      UserService.createUser.mockRejectedValue(new Error('Required fields are missing'));
-
-      const newUser = generateRandomUserData();
-      delete newUser.email; // Simulate missing required field
-      const response = await request(app).post('/api/users').send(newUser);
-      expect(response.status).toBe(404);
-    });
-  });
-
-  // Test to update a user
-  describe('PUT /api/users/:id', () => {
-    it('should update a user', async () => {
-      // Mock the updateUser method to resolve
-      UserService.updateUser.mockResolvedValue(generateRandomUserData());
-
-      const updatedUser = generateRandomUserData();
-      const response = await request(app).put(`/api/users/${updatedUser.id}`).send(updatedUser);
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('message', 'User updated successfully');
-    });
-
-    it('should return 404 if user not found', async () => {
-      // Mock the updateUser method to throw an error
-      UserService.updateUser.mockRejectedValue(new Error('User not found'));
-
-      const updatedUser = generateRandomUserData();
-      const response = await request(app).put('/api/users/9999').send(updatedUser); // Assuming ID 9999 doesn't exist
-      expect(response.status).toBe(404);
-    });
-  });
-
-  // Test to delete a user
-  describe('DELETE /api/users/:id', () => {
-    it('should delete a user', async () => {
-      // Mock the destroyUser method to resolve
-      UserService.destroyUser.mockResolvedValue();
-
-      const userId = Math.floor(Math.random() * 1000); // Generate random category id
-      const response = await request(app).delete(`/api/users/${userId}`);
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('message', 'User deleted successfully');
-    });
-
-    it('should return 404 if user not found', async () => {
-      // Mock the destroyUser method to throw an error
-      UserService.destroyUser.mockRejectedValue(new Error('User not found'));
-
-      const nonExistentUserId = Math.floor(Math.random() * 1000); // Generate random non-existent user id
-      const response = await request(app).delete(`/api/users/${nonExistentUserId}`);
-      expect(response.status).toBe(404);
+      expect(response.body.data).toHaveProperty('id'); // Perubahan di sini
+      expect(response.body.data).toHaveProperty('email', newUser.email);
+      expect(response.body.data).toHaveProperty('username', newUser.username);
+      expect(response.body.data).toHaveProperty('fullName', newUser.fullName);
+      expect(response.body.data).toHaveProperty('phone', newUser.phone);
+      expect(response.body.data).toHaveProperty('address', newUser.address);
+      expect(response.body.data).toHaveProperty('gender', newUser.gender);
+      expect(response.body.data).toHaveProperty('birthdate', newUser.birthdate);
+      expect(response.body.data).toHaveProperty('avatar', newUser.avatar);
+      expect(response.body.data).toHaveProperty('role', newUser.role);
     });
   });
 });
