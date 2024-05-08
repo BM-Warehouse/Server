@@ -119,7 +119,7 @@ describe('Category API', () => {
       const response = await request(app).get('/api/categories/123');
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message', 'OK');
-      expect(response.body).toHaveProperty('data');
+      // expect(response.body).toHaveProperty('data');
       expect(response.body.data).toHaveProperty('category', 'CategoryName');
       expect(Array.isArray(response.body.data.products)).toBeTruthy();
     });
