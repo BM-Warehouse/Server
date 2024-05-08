@@ -2,9 +2,20 @@ const { ClientError } = require('@src/exceptions/error.excecptions');
 const prisma = require('@src/libs/prisma');
 
 class CategoryService {
-  static async getAllCategories() {
-    const categories = await prisma.category.findMany();
+  static async getAllCategories({ page, limit }) {
+    const categories = await prisma.category.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        id: 'asc',
+      },
+    });
     return categories;
+  }
+
+  static async getAllCount() {
+    const categoriesCount = await prisma.category.count();
+    return categoriesCount;
   }
 
   static async addCategory(categoryName, categoryDescription, categoryImageUrl) {
