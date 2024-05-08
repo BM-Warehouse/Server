@@ -1,5 +1,8 @@
 const cron = require('node-cron');
 const prisma = require('./prisma');
+const { sendBatchtoEmailList } = require('./mailer');
+
+const dummyMailList = []; // isi dummy mail list disini
 
 function formatDataAsTable(data) {
   let tableHTML = `
@@ -67,7 +70,11 @@ async function getExpiredProduct(filter = null) {
 }
 
 function runExpiredCheckScheduler() {
-  cron.schedule('* * * * *', async () => {});
+  cron.schedule('* * * * *', async () => {
+    // atur frekuensi pengecekan db disini
+    const batches = await getExpiredProduct();
+    sendBatchtoEmailList(batches, dummyMailList);
+  });
 }
 
 module.exports = {
