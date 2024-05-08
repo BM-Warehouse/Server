@@ -110,10 +110,10 @@ describe('Category API', () => {
       // Mock the getProductByCategory method to resolve
       const mockedProducts = Array.from({ length: 5 }, generateRandomData);
       // eslint-disable-next-line max-len
-      CategoryService.getIdProduct.mockResolvedValue({
-        name: 'CategoryName',
-        productCategories: [{ productId: 123 }],
-      });
+      // CategoryService.getIdProduct.mockResolvedValue({
+      //   name: 'CategoryName',
+      //   productCategories: [{ productId: 123 }],
+      // });
       CategoryService.getProductByCategory.mockResolvedValue(mockedProducts);
 
       const response = await request(app).get('/api/categories/123');
