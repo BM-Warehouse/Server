@@ -1,3 +1,4 @@
+const { ClientError } = require('@src/exceptions/error.excecptions');
 const prisma = require('@src/libs/prisma');
 
 class CategoryService {
@@ -6,27 +7,23 @@ class CategoryService {
     return categories;
   }
 
-  static async addCategory(categoryName, categoryDescription, productName, productDescription) {
-    await prisma.category.create({
-      data: {
+  static async addCategory(categoryName, categoryDescription, categoryImageUrl) {
+    const categoryCheck = await prisma.category.findFirst({
+      where: {
         name: categoryName,
-        description: categoryDescription,
-        imageUrl: `http://www.example.com/product/${Math.floor(Math.random() * 10)}`,
-        productCategories: {
-          create: {
-            product: {
-              create: {
-                name: productName,
-                description: productDescription,
-                totalStock: Math.floor(Math.random() * 100) + 1,
-                price: Math.floor(100 + Math.random() * 900) * 100,
-                imageUrl: `http://www.example.com/product/${Math.floor(Math.random() * 10)}`,
-              },
-            },
-          },
-        },
       },
     });
+    if (!categoryCheck) {
+      await prisma.category.create({
+        data: {
+          name: categoryName,
+          description: categoryDescription,
+          imageUrl: categoryImageUrl,
+        },
+      });
+    } else {
+      throw new ClientError('Category already exist', 'Conflict');
+    }
   }
 
   static async editCategory(id, name, description, imageUrl) {
@@ -50,29 +47,21 @@ class CategoryService {
     });
   }
 
-  static async getIdProduct(categoryId) {
-    const category = await prisma.category.findUnique({
+  static async getProductByCategory(categoryId) {
+    const category = await prisma.category.findMany({
       where: {
         id: categoryId,
       },
-      include: {
+      select: {
+        name: true,
         productCategories: {
           select: {
-            productId: true,
+            product: true,
           },
         },
       },
     });
     return category;
-  }
-
-  static async getProductByCategory(productId) {
-    const products = await prisma.product.findMany({
-      where: {
-        id: productId,
-      },
-    });
-    return products;
   }
 }
 

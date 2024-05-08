@@ -111,15 +111,15 @@ describe('User API', () => {
 
   // Test to delete a user
   describe('DELETE /api/users/:id', () => {
-    // it('should delete a user', async () => {
-    //   // Mock the destroyUser method to resolve
-    //   UserService.destroyUser.mockResolvedValue();
+    it('should delete a user', async () => {
+      // Mock the destroyUser method to resolve
+      UserService.destroyUser.mockResolvedValue();
 
-    //   const userId = Math.floor(Math.random() * 1000); // Generate random category id
-    //   const response = await request(app).delete(`/api/users/${userId}`);
-    //   expect(response.status).toBe(200);
-    //   expect(response.body).toHaveProperty('message', 'User deleted successfully');
-    // });
+      const userId = Math.floor(Math.random() * 1000); // Generate random category id
+      const response = await request(app).delete(`/api/users/${userId}`);
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'User deleted successfully');
+    });
 
     it('should return 404 if user not found', async () => {
       // Mock the destroyUser method to throw an error

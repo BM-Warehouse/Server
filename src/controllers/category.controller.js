@@ -12,13 +12,8 @@ class CategoryController {
 
   static async addCategory(req, res, next) {
     try {
-      const { categoryName, categoryDescription, productName, productDescription } = req.body;
-      await CategoryService.addCategory(
-        categoryName,
-        categoryDescription,
-        productName,
-        productDescription,
-      );
+      const { categoryName } = req.body;
+      await CategoryService.addCategory(categoryName);
       res.status(201).json({ message: 'category added successfully' });
     } catch (e) {
       next(e);
@@ -50,11 +45,8 @@ class CategoryController {
     try {
       const { id } = req.params;
       const categoryId = +id;
-      const data = await CategoryService.getIdProduct(categoryId);
-      const productId = data.productCategories[0].productId;
-      const products = await CategoryService.getProductByCategory(productId);
-      const categoryName = data.name;
-      res.status(200).json({ message: 'OK', data: { category: categoryName, products: products } });
+      const category = await CategoryService.getProductByCategory(categoryId);
+      res.status(200).json({ message: 'OK', category });
     } catch (e) {
       next(e);
     }
