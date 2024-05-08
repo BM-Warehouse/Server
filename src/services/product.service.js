@@ -410,7 +410,7 @@ class ProductService {
         });
 
         //kurangi quantity warehouse source
-        await tx.productWarehouse.update({
+        const pw = await tx.productWarehouse.update({
           where: {
             productId_warehouseId: {
               productId: product.id,
@@ -423,6 +423,18 @@ class ProductService {
             },
           },
         });
+
+        // hapus kalo quantitynya 0
+        if (pw.quantity == 0) {
+          await tx.productWarehouse.delete({
+            where: {
+              productId_warehouseId: {
+                productId: product.id,
+                warehouseId: warehouseSource.id,
+              },
+            },
+          });
+        }
       });
     } catch (e) {
       if (!(e instanceof ClientError)) {
