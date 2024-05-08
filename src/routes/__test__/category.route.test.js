@@ -120,8 +120,8 @@ describe('Category API', () => {
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message', 'OK');
       // expect(response.body).toHaveProperty('data');
-      expect(response.body.data).toHaveProperty('category', 'CategoryName');
-      expect(Array.isArray(response.body.data.products)).toBeTruthy();
+      expect(response.body).toHaveProperty('category', 'CategoryName');
+      expect(Array.isArray(response.body.products)).toBeTruthy();
     });
 
     it('should return 404 if category not found', async () => {
