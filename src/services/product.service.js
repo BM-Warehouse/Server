@@ -18,9 +18,48 @@ class ProductService {
     return expireDate;
   }
 
-  static async getAll({ page, limit }) {
+  static async getAll(payload) {
+    const { page, limit, categoryId, warehouseId } = payload;
+    let where = {};
+
+    if (categoryId)
+      where.productCategories = {
+        some: {
+          categoryId: +categoryId,
+        },
+      };
+    if (warehouseId)
+      where.productWarehouses = {
+        some: {
+          warehouseId: +warehouseId,
+        },
+      };
+
     try {
       const products = await prisma.product.findMany({
+        where,
+        include: {
+          productCategories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          productWarehouses: {
+            select: {
+              warehouse: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
         skip: (page - 1) * limit,
         take: limit,
       });
@@ -28,7 +67,7 @@ class ProductService {
       return products;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e.message);
+        throw new InternalServerError('Fail to get product', e.message);
       } else {
         throw e;
       }
