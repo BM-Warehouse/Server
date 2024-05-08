@@ -12,7 +12,7 @@
     "db-reset": "prisma migrate reset",
     "prepare:husky": "husky install",
     "start": "nodemon server.js",
-    "test": "jest --coverage"
+    "test": "jest --forceExit"
   },
   "author": "BM-WAREHOUSE RAKAMIN",
   "license": "ISC",
