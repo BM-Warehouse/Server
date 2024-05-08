@@ -24,4 +24,7 @@ jobs:
             git pull
             git status
             pnpm install
+            rm -f .env
+            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" >> .env
+            echo "SECRET_KEY=\"${{ secrets.SECRET_KEY }}\"" >> .env
             pm2 list
