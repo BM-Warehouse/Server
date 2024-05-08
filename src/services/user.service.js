@@ -10,7 +10,7 @@ class UserService {
 
       return users;
     } catch (e) {
-      throw e;
+      throw new e();
     }
   }
 
@@ -23,7 +23,7 @@ class UserService {
       });
       return user;
     } catch (e) {
-      throw e;
+      throw new e();
     }
   }
 
@@ -56,7 +56,7 @@ class UserService {
       });
       return user;
     } catch (e) {
-      throw e;
+      throw new e();
     }
   }
 
@@ -92,7 +92,7 @@ class UserService {
 
       return user;
     } catch (e) {
-      throw e;
+      throw new e();
     }
   }
 
@@ -104,7 +104,7 @@ class UserService {
         },
       });
     } catch (e) {
-      throw e;
+      throw new e();
     }
   }
 }
