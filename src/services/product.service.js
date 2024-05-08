@@ -1,4 +1,5 @@
 const prisma = require('@libs/prisma');
+const { getExpiredProduct } = require('@libs/expiredChecker');
 const {
   InternalServerError,
   ClientError,
@@ -434,19 +435,7 @@ class ProductService {
 
   static async getExpired(filter) {
     try {
-      let where = {
-        expireDate: {
-          lt: new Date(),
-        },
-      };
-
-      if (filter.warehouseId) where.warehouseId = +filter.warehouseId;
-
-      const batches = await prisma.batch.findMany({
-        where,
-        skip: (filter.page - 1) * filter.limit,
-        take: filter.limit,
-      });
+      const batches = await getExpiredProduct(filter);
       return batches;
     } catch (e) {
       if (!(e instanceof ClientError)) {

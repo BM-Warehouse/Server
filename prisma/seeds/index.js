@@ -26,8 +26,6 @@ async function updateProductStock() {
 
     let totalStock = productWarehouses.reduce((sum, item) => sum + item.quantity, 0);
 
-    console.log(product.id, totalStock);
-
     const a = await prisma.product.update({
       where: {
         id: product.id
@@ -41,19 +39,19 @@ async function updateProductStock() {
 
 async function main() {
   // tambah fungsi seed disini
-  await seedProducts();
-  await seedCategories();
-  await seedWarehouses();
-  await seedUsers();
-  await seedCheckouts();
-  await seedBatches();
-  await seedCarts();
-  await seedProductCarts();
-  await seedProductCategories();
-  await seedProductCheckout();
-  await seedProductWarehouses();
+  // await seedProducts();
+  // await seedCategories();
+  // await seedWarehouses();
+  // await seedUsers();
+  // await seedCheckouts();
+  // await seedBatches();
+  // await seedCarts();
+  // await seedProductCarts();
+  // await seedProductCategories();
+  // await seedProductCheckout();
+  // await seedProductWarehouses();
 
-  await updateProductStock();
+  // await updateProductStock();
 }
 
 main();
