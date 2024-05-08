@@ -1,4 +1,5 @@
 const prisma = require('@libs/prisma');
+const { getExpiredProduct } = require('@libs/expiredChecker');
 const {
   InternalServerError,
   ClientError,
@@ -81,7 +82,10 @@ class ProductService {
       }
 
       product = await prisma.product.create({
-        data,
+        data: {
+          ...data,
+          totalStock: 0,
+        },
       });
       return product;
     } catch (e) {
@@ -95,9 +99,26 @@ class ProductService {
 
   static async edit(payload) {
     try {
-      const { id, name, description, totalStock, price, imageUrl } = payload;
+      const { id, name, description, price, imageUrl } = payload;
 
-      let product = await this.getDetail(id);
+      // ------ validation ----- //
+      let product = await prisma.product.findFirst({
+        where: {
+          name,
+          NOT: {
+            id,
+          },
+        },
+      });
+
+      if (product) {
+        throw new ConflictError(
+          'Product name exist already',
+          `There is a product with name '${name}'`,
+        );
+      }
+
+      product = await this.getDetail(id);
       if (!product) {
         throw new NotFoundError('No product found', `There is no product with id ${id}`);
       }
@@ -106,7 +127,6 @@ class ProductService {
         data: {
           name,
           description,
-          totalStock,
           price,
           imageUrl,
         },
@@ -117,7 +137,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e);
+        throw new InternalServerError('Fail to edit Product to db', e);
       } else {
         throw e;
       }
@@ -407,6 +427,19 @@ class ProductService {
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to add product to warehouse', e);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async getExpired(filter) {
+    try {
+      const batches = await getExpiredProduct(filter);
+      return batches;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to get expired product', e);
       } else {
         throw e;
       }
