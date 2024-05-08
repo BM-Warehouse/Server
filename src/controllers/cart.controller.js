@@ -58,7 +58,10 @@ class CartController {
   }
   static async resetCart(req, res, next) {
     try {
-      const item = await CartService.resetCartToDefault(+req.user.id);
+      //Buat Tes
+      const item = await CartService.resetCartToDefault(+req.query.userId);
+
+      // const item = await CartService.resetCartToDefault(+req.user.id);
       return res.json({
         status: 'success',
         message: 'All item on the cart are deleted successfully',

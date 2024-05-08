@@ -10,20 +10,24 @@ const prisma = require('@src/libs/prisma');
 
 class CartService {
   static async getAllCarts() {
-    const carts = await prisma.cart.findMany({
-      include: {
-        ProductCart: {
-          include: {
-            product: true,
+    try {
+      const carts = await prisma.cart.findMany({
+        include: {
+          ProductCart: {
+            include: {
+              product: true,
+            },
           },
         },
-      },
-      orderBy: {
-        id: 'asc',
-      },
-    });
-    // const carts = await prisma.cart.findMany();
-    return carts;
+        orderBy: {
+          id: 'asc',
+        },
+      });
+      return carts;
+      // const carts = await prisma.cart.findMany();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   static async fetchCart(userId) {
@@ -66,7 +70,7 @@ class CartService {
   static async resetCartToDefault(userId) {
     await prisma.$transaction([
       prisma.cart.update({
-        where: { userId: userId },
+        where: { userId },
         data: {
           totalPrice: 0,
           status: 'not checkouted',
