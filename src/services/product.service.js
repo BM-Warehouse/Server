@@ -474,6 +474,16 @@ class ProductService {
             },
           });
         }
+
+        // buat record di outgoing record
+        await tx.outgoingRecord.create({
+          data: {
+            quantity: +quantity,
+            status: 'Move to Another Warehouse',
+            productId: product.id,
+            warehouseId: warehouseSource.id,
+          },
+        });
       });
     } catch (e) {
       if (!(e instanceof ClientError)) {
