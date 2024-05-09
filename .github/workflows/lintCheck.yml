@@ -1,4 +1,4 @@
-name: check linter
+name: check linter and unit tests
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   # --- check lint ---------------
-  lint:
+  lint_unit_test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,3 +28,6 @@ jobs:
 
       - name: Running test lint
         run: pnpm lint:check
+
+      - name: Running unit testing with jest
+        run: pnpm test
