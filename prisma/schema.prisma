@@ -62,7 +62,7 @@ model Checkout {
 
 model Product {
   id          Int      @id @default(autoincrement())
-  name        String    @unique
+  name        String    
   description String?
   totalStock  Int?
   price       Int
@@ -76,6 +76,7 @@ model Product {
   productCategories ProductCategory[]
   productCarts      ProductCart[]
   batches           Batch[]
+  outgoingRecord    OutgoingRecord[]
 }
 
 model Warehouse {
@@ -88,6 +89,7 @@ model Warehouse {
 
   productsWarehouses ProductWarehouse[]
   batches            Batch[]
+  outgoingRecord     OutgoingRecord[]
 }
 
 model Batch {
@@ -171,4 +173,16 @@ model ProductCart {
   updatedAt    DateTime @updatedAt
 
   @@id([productId, cartId])
+}
+
+model OutgoingRecord {
+  id      Int   @id @default(autoincrement())
+  status  String
+
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  warehouseId Int
+  
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId   Int
+  quantity    Int
 }
