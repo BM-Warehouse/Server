@@ -18,9 +18,48 @@ class ProductService {
     return expireDate;
   }
 
-  static async getAll({ page, limit }) {
+  static async getAll(payload) {
+    const { page, limit, categoryId, warehouseId } = payload;
+    let where = {};
+
+    if (categoryId)
+      where.productCategories = {
+        some: {
+          categoryId: +categoryId,
+        },
+      };
+    if (warehouseId)
+      where.productWarehouses = {
+        some: {
+          warehouseId: +warehouseId,
+        },
+      };
+
     try {
       const products = await prisma.product.findMany({
+        where,
+        include: {
+          productCategories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          productWarehouses: {
+            select: {
+              warehouse: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
         skip: (page - 1) * limit,
         take: limit,
       });
@@ -28,7 +67,7 @@ class ProductService {
       return products;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e);
+        throw new InternalServerError('Fail to get product', e.message);
       } else {
         throw e;
       }
@@ -54,7 +93,7 @@ class ProductService {
       return products;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get detail of product', e);
+        throw new InternalServerError('Fail to get detail of product', e.message);
       } else {
         throw e;
       }
@@ -90,7 +129,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to add product list to db', e);
+        throw new InternalServerError('Fail to add product list to db', e.message);
       } else {
         throw e;
       }
@@ -137,7 +176,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to edit Product to db', e);
+        throw new InternalServerError('Fail to edit Product to db', e.message);
       } else {
         throw e;
       }
@@ -159,97 +198,7 @@ class ProductService {
       return product;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e);
-      } else {
-        throw e;
-      }
-    }
-  }
-
-  static async addToWarehouse(payload) {
-    let { warehouseName, productName, quantity } = payload;
-    if (quantity) quantity = +quantity;
-    try {
-      // ------- validasi request ----------- //
-      if (!warehouseName || !productName || !quantity) {
-        throw new BadRequest(
-          'Invalid body parameter',
-          'warehouseName, productName, or quantity cannot be empty!',
-        );
-      }
-      const product = await prisma.product.findFirst({
-        where: {
-          name: productName,
-        },
-      });
-
-      const warehouse = await prisma.warehouse.findFirst({
-        where: {
-          name: warehouseName,
-        },
-      });
-
-      if (!product) {
-        throw new NotFoundError(
-          'No Product Found',
-          `The product with name '${productName}' is not available`,
-        );
-      }
-
-      if (!warehouse) {
-        throw new NotFoundError(
-          'No warehouse Found',
-          `The warehouse with name '${warehouseName}' is not available`,
-        );
-      }
-
-      // -------------- proses --------------- //
-      prisma.$transaction(async (tx) => {
-        await tx.productWarehouse.upsert({
-          where: {
-            productId_warehouseId: {
-              productId: product.id,
-              warehouseId: warehouse.id,
-            },
-          },
-          update: {
-            quantity: {
-              increment: +payload.quantity,
-            },
-          },
-          create: {
-            productId: product.id,
-            warehouseId: warehouse.id,
-            quantity: +payload.quantity,
-          },
-        });
-
-        const expireDate = await this.#generateExpireDateAfter(MAXIMUM_MONTH_BATCH);
-        const batchName = `${product.name}_${warehouse.name}_${+new Date()}`;
-        await tx.batch.create({
-          data: {
-            batchName,
-            productId: product.id,
-            warehouseId: warehouse.id,
-            stock: quantity,
-            expireDate,
-          },
-        });
-
-        await tx.product.update({
-          where: {
-            id: product.id,
-          },
-          data: {
-            totalStock: {
-              increment: quantity,
-            },
-          },
-        });
-      });
-    } catch (e) {
-      if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to add product to warehouse', e);
+        throw new InternalServerError('Fail to delete Product to db', e.message);
       } else {
         throw e;
       }
@@ -320,27 +269,117 @@ class ProductService {
     );
   }
 
+  static async addToWarehouse(payload) {
+    let { warehouseId, productId, quantity } = payload;
+    if (quantity) quantity = +quantity;
+    try {
+      // ------- validasi request ----------- //
+      if (!warehouseId || !productId || !quantity) {
+        throw new BadRequest(
+          'Invalid body parameter',
+          'warehouseId, productId, or quantity cannot be empty!',
+        );
+      }
+      const product = await prisma.product.findFirst({
+        where: {
+          id: productId,
+        },
+      });
+
+      const warehouse = await prisma.warehouse.findFirst({
+        where: {
+          id: warehouseId,
+        },
+      });
+
+      if (!product) {
+        throw new NotFoundError(
+          'No Product Found',
+          `The product with id '${productId}' is not available`,
+        );
+      }
+
+      if (!warehouse) {
+        throw new NotFoundError(
+          'No warehouse Found',
+          `The warehouse with id '${warehouseId}' is not available`,
+        );
+      }
+
+      // -------------- proses --------------- //
+      await prisma.$transaction(async (tx) => {
+        await tx.productWarehouse.upsert({
+          where: {
+            productId_warehouseId: {
+              productId: product.id,
+              warehouseId: warehouse.id,
+            },
+          },
+          update: {
+            quantity: {
+              increment: +payload.quantity,
+            },
+          },
+          create: {
+            productId: product.id,
+            warehouseId: warehouse.id,
+            quantity: +payload.quantity,
+          },
+        });
+
+        const expireDate = await this.#generateExpireDateAfter(MAXIMUM_MONTH_BATCH);
+        const batchName = `${product.name}_${warehouse.name}_${+new Date()}`;
+        await tx.batch.create({
+          data: {
+            batchName,
+            productId: product.id,
+            warehouseId: warehouse.id,
+            stock: quantity,
+            expireDate,
+          },
+        });
+
+        await tx.product.update({
+          where: {
+            id: product.id,
+          },
+          data: {
+            totalStock: {
+              increment: quantity,
+            },
+          },
+        });
+      });
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to add product to warehouse', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
   static async moveWarehouse(payload) {
     try {
       let product = null;
       let warehouseSource = null;
       let warehouseDestination = null;
       const {
-        productName,
-        warehouse: { from, to },
+        productId,
+        warehouseId: { from, to },
         quantity,
       } = payload;
       // ------ validation ---------- //
-      if (!productName || !to || !from) {
+      if (!productId || !to || !from) {
         throw new BadRequest(
           'Invalid body parameter',
-          'productName, warehouse.to, or warehouse.from cannot be empty!',
+          'productId, warehouse.to, or warehouse.from cannot be empty!',
         );
       }
 
       product = await prisma.product.findFirst({
         where: {
-          name: productName,
+          id: productId,
         },
       });
 
@@ -353,13 +392,13 @@ class ProductService {
 
       warehouseSource = await prisma.warehouse.findFirst({
         where: {
-          name: from,
+          id: from,
         },
       });
 
       warehouseDestination = await prisma.warehouse.findFirst({
         where: {
-          name: to,
+          id: to,
         },
       });
 
@@ -410,7 +449,7 @@ class ProductService {
         });
 
         //kurangi quantity warehouse source
-        await tx.productWarehouse.update({
+        const pw = await tx.productWarehouse.update({
           where: {
             productId_warehouseId: {
               productId: product.id,
@@ -423,10 +462,22 @@ class ProductService {
             },
           },
         });
+
+        // hapus kalo quantitynya 0
+        if (pw.quantity == 0) {
+          await tx.productWarehouse.delete({
+            where: {
+              productId_warehouseId: {
+                productId: product.id,
+                warehouseId: warehouseSource.id,
+              },
+            },
+          });
+        }
       });
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to add product to warehouse', e);
+        throw new InternalServerError('Fail to add product to warehouse', e.message);
       } else {
         throw e;
       }
@@ -439,7 +490,7 @@ class ProductService {
       return batches;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get expired product', e);
+        throw new InternalServerError('Fail to get expired product', e.message);
       } else {
         throw e;
       }
