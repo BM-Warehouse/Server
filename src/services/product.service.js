@@ -19,21 +19,35 @@ class ProductService {
   }
 
   static async getAll(payload) {
-    const { page, limit, categoryId, warehouseId } = payload;
-    let where = {};
+    const { page, limit, categoryId, warehouseId, minPrice, maxPrice } = payload;
+    let where = { price: {} };
 
-    if (categoryId)
+    if (categoryId) {
       where.productCategories = {
         some: {
           categoryId: +categoryId,
         },
       };
-    if (warehouseId)
+    }
+    if (warehouseId) {
       where.productWarehouses = {
         some: {
           warehouseId: +warehouseId,
         },
       };
+    }
+    if (maxPrice) {
+      where.price = {
+        ...where.price,
+        lte: +maxPrice,
+      };
+    }
+    if (minPrice) {
+      where.price = {
+        ...where.price,
+        gte: +minPrice,
+      };
+    }
 
     try {
       const products = await prisma.product.findMany({
