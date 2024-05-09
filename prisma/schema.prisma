@@ -39,7 +39,6 @@ model Cart {
   userId Int   @unique //untuk one to one perlu dikasih unique gini
 
   totalPrice Int?
-  status     String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -54,6 +53,7 @@ model Checkout {
 
   totalPrice Int?
   status     String?  @default("sedang dikemas")
+  resi       String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -62,7 +62,7 @@ model Checkout {
 
 model Product {
   id          Int      @id @default(autoincrement())
-  name        String    
+  name        String
   description String?
   totalStock  Int?
   price       Int
@@ -81,7 +81,7 @@ model Product {
 
 model Warehouse {
   id        Int      @id @default(autoincrement())
-  name      String    @unique
+  name      String   @unique
   address   String?
   city      String?
   createdAt DateTime @default(now())
@@ -90,6 +90,7 @@ model Warehouse {
   productsWarehouses ProductWarehouse[]
   batches            Batch[]
   outgoingRecord     OutgoingRecord[]
+  productCheckouts   ProductCheckout[]
 }
 
 model Batch {
@@ -139,6 +140,9 @@ model ProductCheckout {
   checkout   Checkout @relation(fields: [checkoutId], references: [id], onDelete: Cascade)
   checkoutId Int
 
+  warehouse Warehouse? @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  warehouseId Int?
+
   quantityItem Int?
   productPrice Int?
   createdAt    DateTime @default(now())
@@ -148,7 +152,6 @@ model ProductCheckout {
 }
 
 model ProductWarehouse {
-
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
 
@@ -176,13 +179,13 @@ model ProductCart {
 }
 
 model OutgoingRecord {
-  id      Int   @id @default(autoincrement())
-  status  String
+  id     Int    @id @default(autoincrement())
+  status String
 
   warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
   warehouseId Int
-  
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId   Int
-  quantity    Int
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  quantity  Int
 }

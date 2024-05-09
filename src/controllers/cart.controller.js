@@ -71,6 +71,20 @@ class CartController {
       next(e);
     }
   }
+
+  static async addProductToCart(req, res, next) {
+    try {
+      const item = await CartService.addProductToCart(req.body);
+
+      return res.json({
+        status: 'success',
+        message: 'All item on the cart are deleted successfully',
+        data: item,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = CartController;

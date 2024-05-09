@@ -6,6 +6,7 @@ const {
   BadRequest,
   ConflictError,
 } = require('@exceptions/error.excecptions');
+const checkoutStatus = require('@constants/checkoutStatus');
 
 class CheckoutService {
   static async getAll({ page, limit }) {
@@ -151,6 +152,75 @@ class CheckoutService {
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Failed to delete checkout', e);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async action({ cartId }) {
+    try {
+      const cart = await prisma.cart.findUnique({
+        where: {
+          id: cartId,
+        },
+      });
+
+      if (!cart) {
+        throw new NotFoundError('No Cart Found', `There is no cart with id ${cartId}`);
+      }
+
+      if (cart.totalPrice == 0) {
+        throw new ConflictError('Cart empty!!', 'There is no item in the cart');
+      }
+
+      const count = await prisma.$transaction(async (tx) => {
+        // --- buat record di checkout
+        const checkout = await tx.checkout.create({
+          data: {
+            status: checkoutStatus.PACKING,
+            totalPrice: cart.totalPrice,
+            userId: cart.userId,
+          },
+        });
+
+        // ---- ambil data dari product cart
+        const productCart = await tx.productCart.findMany({});
+
+        // --- tulis data ke productCheckout
+        let data = [];
+        productCart.forEach((item) => {
+          data.push({
+            checkoutId: checkout.id,
+            productId: item.productId,
+            quantityItem: item.quantityItem,
+            productPrice: item.productPrice,
+          });
+        });
+
+        await tx.productCheckout.createMany({
+          data,
+        });
+
+        // --- kosongkan table productCart
+        await tx.productCart.deleteMany({
+          where: {
+            cartId,
+          },
+        });
+
+        const productCheckout = tx.productCheckout.findMany({
+          where: {
+            checkoutId: checkout.id,
+          },
+        });
+        return productCheckout;
+      });
+
+      return count;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to delete checkout', e.message);
       } else {
         throw e;
       }

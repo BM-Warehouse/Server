@@ -97,6 +97,58 @@ class CartService {
       },
     });
   }
+
+  static async addProductToCart({ productId, cartId, quantity }) {
+    // console.log(productId, cartId);
+    try {
+      // -------- validasi ------- //
+      const product = await prisma.product.findFirst({
+        where: {
+          id: productId,
+        },
+      });
+
+      prisma.$transaction(async (tx) => {
+        // ---- update productCart
+        await tx.productCart.upsert({
+          where: {
+            productId_cartId: {
+              cartId,
+              productId,
+            },
+          },
+          update: {
+            quantityItem: {
+              increment: +quantity,
+            },
+            productPrice: {
+              increment: +quantity * product.price,
+            },
+          },
+          create: {
+            cartId,
+            productId,
+            quantityItem: +quantity,
+            productPrice: +quantity * product.price,
+          },
+        });
+
+        // ---- update cart
+        await tx.cart.update({
+          where: {
+            id: cartId,
+          },
+          data: {
+            totalPrice: {
+              increment: +quantity * product.price,
+            },
+          },
+        });
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 }
 
 module.exports = CartService;
