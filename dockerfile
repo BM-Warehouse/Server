@@ -7,8 +7,10 @@ RUN npm install -g pnpm nodemon
 # Set folder kerja di dalam container
 WORKDIR /server
 
-# Salin package.json dan package-lock.json (jika ada)
+# Salin package.json dan pnpm
 COPY package*.json ./
+COPY pnpm-lock.yaml ./
+COPY .env ./
 
 # Install dependensi
 RUN pnpm install
