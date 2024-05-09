@@ -10,5 +10,6 @@ router.delete('/:id', ProductController.delete);
 router.post('/warehouse/add', ProductController.addToWarehouse);
 router.post('/warehouse/move', ProductController.moveWarehouse);
 router.get('/expired', ProductController.getExpired);
+router.post('/damage', ProductController.damage);
 
 module.exports = router;

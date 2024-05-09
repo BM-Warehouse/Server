@@ -105,6 +105,35 @@ class ProductController {
       next(e);
     }
   }
+
+  static async damage(req, res, next) {
+    try {
+      if (!req.body.productId || !req.body.warehouseId || !req.body.quantity) {
+        throw new BadRequest(
+          'Damage Report parameter Error',
+          'productId, warehouseId, and quantity must be supplied',
+        );
+      }
+
+      if (isNaN(req.body.productId) || isNaN(req.body.warehouseId) || isNaN(req.body.quantity)) {
+        throw new BadRequest(
+          'Damage Report parameter Error',
+          'productId, warehouseId, and quantity must be a number',
+        );
+      }
+
+      const payload = {
+        productId: +req.body.productId,
+        warehouseId: +req.body.warehouseId,
+        quantity: +req.body.quantity,
+      };
+
+      const batches = await ProductService.damage(payload);
+      res.status(200).json(successResponse(batches, 'Successfully retieve data from batch'));
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = ProductController;

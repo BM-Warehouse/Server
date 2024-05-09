@@ -506,6 +506,92 @@ class ProductService {
       }
     }
   }
+
+  static async damage({ productId, warehouseId, quantity }) {
+    try {
+      // ------ validation ---------- //
+      const product = await prisma.product.findFirst({
+        where: {
+          id: productId,
+        },
+      });
+
+      if (!product) {
+        throw new NotFoundError('Product is not found', `No Product with id ${productId}`);
+      }
+
+      const warehouse = await prisma.warehouse.findFirst({
+        where: {
+          id: warehouseId,
+        },
+      });
+
+      if (!warehouse) {
+        throw new NotFoundError('warehouse is not found', `No warehouse with id ${warehouseId}`);
+      }
+
+      // ---------- Proses --------- //
+      await prisma.$transaction(async (tx) => {
+        //ambil kurangi quantity dari batch
+        await this.#takeFromBatches(product, warehouse, quantity, tx);
+
+        //kurangi quantity di warehouse
+        const pw = await tx.productWarehouse.update({
+          where: {
+            productId_warehouseId: {
+              productId: product.id,
+              warehouseId: warehouse.id,
+            },
+          },
+          data: {
+            quantity: {
+              decrement: quantity,
+            },
+          },
+        });
+
+        // hapus kalo quantitynya 0
+        if (pw.quantity == 0) {
+          await tx.productWarehouse.delete({
+            where: {
+              productId_warehouseId: {
+                productId: product.id,
+                warehouseId: warehouse.id,
+              },
+            },
+          });
+        }
+
+        // kurangi quantity di product
+        await tx.product.update({
+          where: {
+            id: product.id,
+          },
+          data: {
+            totalStock: {
+              decrement: quantity,
+            },
+          },
+        });
+
+        // buat record di outgoing record
+        await tx.outgoingRecord.create({
+          data: {
+            quantity: +quantity,
+            status: 'Damage',
+            productId: product.id,
+            warehouseId: warehouse.id,
+          },
+        });
+      });
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to add product to warehouse', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = ProductService;
