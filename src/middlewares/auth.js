@@ -5,20 +5,25 @@ const authentication = async (req, res, next) => {
   if (req.headers.authorization) {
     const accessToken = req.headers.authorization.split(' ')[1];
 
-    const decoded = await jwt.verifyToken(accessToken);
-    const result = await AuthService.findUserById(decoded.id);
-    if (!result) {
-      throw new Error('User not found');
-    } else {
+    try {
+      const decoded = await jwt.verifyToken(accessToken);
+      const result = await AuthService.findUserById(decoded.id);
+      if (!result) {
+        throw new Error('User not found');
+      }
       req.loggedUser = {
         id: result.id,
         username: result.username,
         role: result.role,
       };
       next();
+    } catch (error) {
+      next(error);
     }
   } else {
-    throw new Error('Unauthorized');
+    // Jika tidak ada token diberikan, kirim tanggapan JSON 'Unauthorized'
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
   }
 };
 
