@@ -26,8 +26,6 @@ async function updateProductStock() {
 
     let totalStock = productWarehouses.reduce((sum, item) => sum + item.quantity, 0);
 
-    console.log(product.id, totalStock);
-
     const a = await prisma.product.update({
       where: {
         id: product.id

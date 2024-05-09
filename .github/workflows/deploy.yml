@@ -1,4 +1,4 @@
-name: Deploy to cloud 
+name: Deploy to cloud with Docker image
 
 on:
   push:
@@ -6,13 +6,31 @@ on:
       - main
 
 jobs:
-  #======Deploy to cloud with ssh =====
+  #======Deploy to cloud with Docker =====
   build:
     runs-on: ubuntu-latest
 
     steps:
-        # Connect server cloud with ssh
-      - name: Deploy using ssh
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Create .env file with secrets
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+
+      # Build and push Docker image to Docker Hub
+      - name: Build and push Docker image
+        run: |
+          docker build -t bm_warehouse_api .
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker tag bm_warehouse_api "${{ secrets.DOCKER_USERNAME }}/bm_warehouse_api:latest"
+          docker push "${{ secrets.DOCKER_USERNAME }}/bm_warehouse_api:latest"
+
+      # SSH into cloud server and deploy Docker image
+      - name: Deploy Docker image
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -20,11 +38,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: 22
           script: |
-            cd ~/app/BMWAREHOUSE/Server
-            git pull
-            git status
-            pnpm install
-            rm -f .env
-            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" >> .env
-            echo "SECRET_KEY=\"${{ secrets.SECRET_KEY }}\"" >> .env
-            pm2 list
+            docker pull "${{ secrets.DOCKER_USERNAME }}/bm_warehouse_api:latest"
+            docker stop bmwarehouse_container || true
+            docker rm bmwarehouse_container || true
+            docker run -d -p 5000:5000 --name bmwarehouse_container "${{ secrets.DOCKER_USERNAME }}/bm_warehouse_api:latest"
