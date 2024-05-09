@@ -43,7 +43,7 @@ model Cart {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  products ProductCart[]
+  ProductCart ProductCart[]
 }
 
 model Checkout {
