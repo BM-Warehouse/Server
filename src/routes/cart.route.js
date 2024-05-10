@@ -5,6 +5,7 @@ router.get('/', CartController.getAllCarts);
 router.get('/user', CartController.showCart);
 
 router.post('/', CartController.resetCart);
+router.post('/addProduct', CartController.addProductToCart);
 
 router.put('/:id', CartController.updateCart);
 
