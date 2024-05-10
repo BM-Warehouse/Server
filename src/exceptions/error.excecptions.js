@@ -45,10 +45,24 @@ class ConflictError extends ClientError {
   }
 }
 
+class UnauthorizedError extends ClientError {
+  constructor(message, detail = undefined) {
+    super(message, errorType.UNAUTHORIZED, 401, detail);
+  }
+}
+
+class ForbiddenError extends ClientError {
+  constructor(message, detail = undefined) {
+    super(message, errorType.UNAUTHORIZED, 403, detail);
+  }
+}
+
 module.exports = {
   ClientError,
   BadRequest,
   InternalServerError,
   NotFoundError,
   ConflictError,
+  UnauthorizedError,
+  ForbiddenError,
 };
