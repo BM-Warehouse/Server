@@ -1,6 +1,7 @@
 const AuthService = require('@services/auth.service');
 const bcrypt = require('@libs/bcrypt');
 const jwt = require('@libs/jwt');
+const { BadRequest, UnauthorizedError } = require('@exceptions/error.excecptions');
 
 class AuthController {
   static async register(req, res, next) {
@@ -18,7 +19,15 @@ class AuthController {
         role,
       } = req.body;
 
+      if (!email || !username || !password) {
+        throw new BadRequest(
+          'Invalid body parameter',
+          'Email, username, and password are required fields',
+        );
+      }
+
       const hashPass = bcrypt.hashPassword(password);
+
       const user = await AuthService.register(
         email,
         username,
@@ -31,6 +40,7 @@ class AuthController {
         avatar,
         role,
       );
+
       res.status(201).json({ data: user, message: 'User added successfully' });
     } catch (e) {
       next(e);
@@ -40,6 +50,7 @@ class AuthController {
   static login = async (req, res, next) => {
     try {
       const { username, password } = req.body;
+
       const foundUser = await AuthService.findUserByUsername(username);
 
       if (bcrypt.comparePassword(password, foundUser.password)) {
@@ -50,7 +61,7 @@ class AuthController {
         });
         res.status(200).json({ message: 'Login succesfully', accessToken });
       } else {
-        throw new Error('Passwordiswrong');
+        throw new UnauthorizedError('Unauthorized', 'The password entered is incorrect');
       }
     } catch (e) {
       next(e);
