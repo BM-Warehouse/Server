@@ -49,7 +49,13 @@ class CartController {
   static async resetCartToDefault(req, res, next) {
     try {
       const item = await CartService.resetCartToDefault(+req.loggedUser.id);
-      res.status(200).json(successResponse(item, 'All item on the cart are deleted successfully'));
+      // eslint-disable-next-line max-len
+      // res.status(200).json(successResponse(item, 'All item on the cart are deleted successfully'));
+      return res.json({
+        status: 'success',
+        message: 'All item on the cart are deleted successfully',
+        data: { cart: item },
+      });
     } catch (e) {
       next(e);
     }

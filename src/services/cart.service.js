@@ -54,9 +54,20 @@ class CartService {
       const { id, product } = payload;
       await prisma.$transaction(async (tx) => {
         // Mengecek cart user atau membuat cart user
-        const cart = await tx.cart.findUnique({
+        let cart = await tx.cart.findUnique({
           where: { userId: id },
         });
+
+        if (!cart) {
+          cart = await tx.cart.create({
+            data: {
+              id,
+              userId: id,
+              status: 'not checkouted',
+              totalPrice: 0,
+            },
+          });
+        }
         if (product) {
           const { productId, quantity } = product;
 
@@ -189,7 +200,6 @@ class CartService {
     return prisma.cart.findUnique({
       where: { userId: userId },
       include: {
-        user: true,
         ProductCart: true,
       },
     });
