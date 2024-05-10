@@ -1,37 +1,80 @@
 const jwt = require('@libs/jwt');
 const AuthService = require('@services/auth.service');
+const {
+  UnauthorizedError,
+  InternalServerError,
+  ForbiddenError,
+  ClientError,
+} = require('@exceptions/error.excecptions');
 
-const authentication = async (req, res, next) => {
-  if (req.headers.authorization) {
-    const accessToken = req.headers.authorization.split(' ')[1];
-
+class AuthMiddleware {
+  static async authentication(req, res, next) {
     try {
-      const decoded = await jwt.verifyToken(accessToken);
-      const result = await AuthService.findUserById(decoded.id);
-      if (!result) {
-        throw new Error('User not found');
+      if (req.headers.authorization) {
+        const accessToken = req.headers.authorization.split(' ')[1];
+
+        if (!accessToken) {
+          throw new UnauthorizedError(
+            'Access token is missing',
+            'The access token required for this operation is missing.',
+          );
+        }
+
+        const decoded = await jwt.verifyToken(accessToken);
+
+        if (!decoded) {
+          throw new UnauthorizedError(
+            'Invalid access token',
+            'The access token provided is invalid or expired.',
+          );
+        } else {
+          const result = await AuthService.findUserById(decoded.id);
+
+          req.loggedUser = {
+            id: result.id,
+            username: result.username,
+            role: result.role,
+          };
+          next();
+        }
+      } else {
+        throw new UnauthorizedError(
+          'Authorization header is missing',
+          'The authorization header is required for this operation.',
+        );
       }
-      req.loggedUser = {
-        id: result.id,
-        username: result.username,
-        role: result.role,
-      };
-      next();
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
+      } else {
+        throw e;
+      }
     }
-  } else {
-    // Jika tidak ada token diberikan, kirim tanggapan JSON 'Unauthorized'
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
   }
-};
 
-const authorization = async (req, res, next) => {
-  if (req.loggedUser.role === 'admin') next();
-  else {
-    throw new Error('Unauthorized');
+  static async authorization(req, res, next) {
+    try {
+      if (req.loggedUser.role === 'admin') next();
+      else {
+        throw new ForbiddenError(
+          'Access denied: User does not have admin privileges',
+          'This operation requires admin privileges.',
+        );
+      }
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
+      } else {
+        throw e;
+      }
+    }
   }
-};
+}
 
-module.exports = { authentication, authorization };
+module.exports = AuthMiddleware;

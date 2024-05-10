@@ -1,3 +1,4 @@
+const { successResponse } = require('@src/responses/responses');
 const CartService = require('@src/services/cart.service');
 
 /* eslint-disable no-empty */
@@ -5,68 +6,16 @@ class CartController {
   static async getAllCarts(req, res, next) {
     try {
       const carts = await CartService.getAllCarts();
-      res.status(200).json({
-        status: 'success',
-        message: 'This is the All Carts from All User',
-        data: carts,
-      });
+      res.status(200).json(successResponse({ carts }, 'ok'));
     } catch (e) {
       next(e);
     }
   }
 
-  static async showCart(req, res, next) {
+  static async showUserCart(req, res, next) {
     try {
-      // Ambil id dari user yg telah auth
-      // const userCart = await CartService.fetchCart(+req.user.id);
-
-      // Buat tes, ambil dri query dlu
-      const id = +req.query.id;
-      const userCart = await CartService.fetchCart(id);
-      res.status(200).json({
-        status: 'success',
-        message: 'This is the Cart',
-        data: userCart,
-      });
-    } catch (e) {
-      next(e);
-    }
-  }
-
-  static async updateCart(req, res, next) {
-    try {
-    } catch (e) {
-      next(e);
-    }
-  }
-  static async deleteItem(req, res, next) {
-    try {
-      // const payload = {
-      //   orderCartId: +req.params.id,
-      //   id: +req.params.id,
-      // };
-      const payload = req.body;
-      const item = await CartService.deleteCartProduct(payload);
-      return res.status(200).json({
-        status: 'success',
-        message: 'Product item deleted successfully',
-        data: item,
-      });
-    } catch (e) {
-      next(e);
-    }
-  }
-  static async resetCart(req, res, next) {
-    try {
-      //Buat Tes
-      const item = await CartService.resetCartToDefault(+req.query.userId);
-
-      // const item = await CartService.resetCartToDefault(+req.user.id);
-      return res.json({
-        status: 'success',
-        message: 'All item on the cart are deleted successfully',
-        data: item,
-      });
+      const cart = await CartService.showUserCart(+req.loggedUser.id);
+      res.status(200).json(successResponse({ cart }, 'This is the Cart'));
     } catch (e) {
       next(e);
     }
@@ -74,12 +23,38 @@ class CartController {
 
   static async addProductToCart(req, res, next) {
     try {
-      const item = await CartService.addProductToCart(req.body);
+      const cartUser = await CartService.addProductToCart({ ...req.loggedUser, ...req.body });
+      return res.json({
+        status: 'success',
+        message: 'Item added successfully',
+        data: { cart: cartUser },
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+  static async deleteCartProduct(req, res, next) {
+    try {
+      const payload = {
+        productCartId: +req.params.id,
+        userId: +req.loggedUser.id,
+      };
 
+      const item = await CartService.deleteCartProduct(payload);
+      res.status(200).json(successResponse(item, 'Product item deleted successfully'));
+    } catch (e) {
+      next(e);
+    }
+  }
+  static async resetCartToDefault(req, res, next) {
+    try {
+      const item = await CartService.resetCartToDefault(+req.loggedUser.id);
+      // eslint-disable-next-line max-len
+      // res.status(200).json(successResponse(item, 'All item on the cart are deleted successfully'));
       return res.json({
         status: 'success',
         message: 'All item on the cart are deleted successfully',
-        data: item,
+        data: { cart: item },
       });
     } catch (e) {
       next(e);

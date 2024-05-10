@@ -16,6 +16,6 @@ router.use('/api/categories', categoryRoute);
 router.use('/api/users', userRoute);
 router.use('/api/checkout', checkoutRoute);
 router.use('/api/warehouses', warehouseRoute);
-router.use('/api/carts', cartRoute);
+router.use('/api/cart', cartRoute);
 
 module.exports = router;
