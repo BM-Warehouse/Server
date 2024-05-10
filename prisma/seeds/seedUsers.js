@@ -4,7 +4,7 @@ const users = [
   {
     email: 'admin@mail.com',
     username: 'admin',
-    password: '$2y$10$.QoL7jPVjrzX6pJUIgICzOKTP9kIaDicqUNZE3TpntRRVaBxvZuTy',
+    password: '$2b$10$IoeomY91UGOgbdZF/KUAReBvMh7OtDBB2ukmkeY3JtpZAsRUxyH3G',
     fullName: 'Mister Admin',
     phone: '081234567890',
     address: 'example admin street',
