@@ -3,6 +3,7 @@ const router = require('express').Router();
 
 router.get('/', CheckoutController.getAll);
 
+router.post('/action', CheckoutController.action);
 router.get('/:id', CheckoutController.getDetail);
 
 router.post('/', CheckoutController.add);

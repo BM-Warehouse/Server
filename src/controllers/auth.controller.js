@@ -19,7 +19,8 @@ class AuthController {
       } = req.body;
 
       const hashPass = bcrypt.hashPassword(password);
-      const user = await AuthService.createUser(
+      const user = await AuthService.register(
+
         email,
         username,
         hashPass,
