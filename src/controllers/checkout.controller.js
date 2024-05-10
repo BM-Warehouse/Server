@@ -68,8 +68,16 @@ class CheckoutController {
 
   static async action(req, res, next) {
     try {
-      const productCheeckout = await CheckoutService.action(req.body);
-      res.status(200).json(successResponse(productCheeckout, 'Checkout executed successfully'));
+      const productCheckout = await CheckoutService.action(req.body);
+      res.status(200).json(successResponse(productCheckout, 'Checkout executed successfully'));
+    } catch (e) {
+      next(e);
+    }
+  }
+  static async send(req, res, next) {
+    try {
+      const productCheckout = await CheckoutService.send(req.body);
+      res.status(200).json(successResponse(productCheckout, 'Send checkout executed successfully'));
     } catch (e) {
       next(e);
     }

@@ -9,6 +9,71 @@ const {
 const checkoutStatus = require('@constants/checkoutStatus');
 
 class CheckoutService {
+  static async #takeFromBatches(productId, warehouseId, quantityToTake, tx) {
+    let stillNeedToTake = quantityToTake;
+    let ret = [];
+    //list semua batch
+    let batches = await tx.batch.findMany({
+      where: {
+        productId: productId,
+        warehouseId: warehouseId,
+        stock: {
+          gt: 0,
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    if (!batches) {
+      throw new NotFoundError(
+        'No batch found',
+        `Can't find any batch for product '${productId}' that still has stock available`,
+      );
+    }
+
+    for (const batch of batches) {
+      if (batch.stock < stillNeedToTake) {
+        stillNeedToTake -= batch.stock;
+        await tx.batch.update({
+          where: {
+            id: batch.id,
+          },
+          data: {
+            stock: 0,
+          },
+        });
+
+        ret.push({
+          ...batch,
+          stock: 0,
+        });
+      } else {
+        await tx.batch.update({
+          where: {
+            id: batch.id,
+          },
+          data: {
+            stock: batch.stock - stillNeedToTake,
+          },
+        });
+        ret.push({
+          ...batch,
+          stock: batch.stock - stillNeedToTake,
+        });
+        // console.log(ret);
+        return ret;
+      }
+    }
+
+    // harusnya g pernah reach sini, klo sampek sini berarti ada kesalahan data
+    throw new ConflictError(
+      'Batches stock empty!!',
+      'There are still item to be taken from batches',
+    );
+  }
+
   static async getAll({ page, limit }) {
     try {
       const checkouts = await prisma.checkout.findMany({
@@ -220,7 +285,86 @@ class CheckoutService {
       return count;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Failed to delete checkout', e.message);
+        throw new InternalServerError('Failed to perform checkout', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async send({ checkoutId, warehouseSelections }) {
+    try {
+      await prisma.$transaction(async (tx) => {
+        // --- ubah status dan tambah nomor resi
+        const resi = `${+new Date()}`;
+        await tx.checkout.update({
+          where: {
+            id: +checkoutId,
+          },
+          data: {
+            status: checkoutStatus.SENT,
+            resi,
+          },
+        });
+
+        // --- update warehouse pilihan untuk setiap produk yang dipilih
+        for (const w of warehouseSelections) {
+          await tx.productCheckout.update({
+            where: {
+              productId_checkoutId: {
+                checkoutId: +checkoutId,
+                productId: +w.productId,
+              },
+            },
+            data: {
+              warehouseId: w.warehouseId,
+            },
+          });
+        }
+
+        //--- ambil produk yang di checkout
+        const productCheckouts = await tx.productCheckout.findMany({
+          where: {
+            checkoutId: +checkoutId,
+          },
+        });
+
+        // --- update masing-masing barang yang ada di checkout list
+        for (const i of productCheckouts) {
+          // --- kurangi quantity dari tabel produk
+          await tx.product.update({
+            where: {
+              id: i.productId,
+            },
+            data: {
+              totalStock: {
+                decrement: i.quantityItem,
+              },
+            },
+          });
+
+          // --- kurangi quantity dari tabel productWarehouse
+          await tx.productWarehouse.update({
+            where: {
+              productId_warehouseId: {
+                warehouseId: i.warehouseId,
+                productId: i.productId,
+              },
+            },
+            data: {
+              quantity: {
+                decrement: i.quantityItem,
+              },
+            },
+          });
+
+          // ---- kurangi quantity dari tabel batch
+          await this.#takeFromBatches(i.productId, i.warehouseId, i.quantityItem, tx);
+        }
+      }); // end transaction
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to send checkout', e.message);
       } else {
         throw e;
       }
