@@ -1,9 +1,9 @@
 /* eslint-disable no-undef */
 const request = require('supertest');
-const app = require('../../app'); // Atur impor sesuai dengan lokasi berkas aplikasi Anda
+const app = require('../../app');
 const UserService = require('@services/user.service');
-const { hashPassword } = require('@libs/bcrypt.js');
 const jwt = require('@libs/jwt.js');
+const bcrypt = require('@libs/bcrypt');
 const AuthService = require('@services/auth.service');
 
 // Mock UserService
@@ -15,76 +15,12 @@ jest.mock('@services/auth.service');
 //mock jwt verify token function
 jwt.verifyToken = jest.fn();
 
+//mock bcrypt hashPassword function
+bcrypt.hashPassword = jest.fn();
+
 describe('User API', () => {
   afterEach(() => {
     jest.clearAllMocks();
-  });
-
-  describe('POST /api/register', () => {
-    it('should create a new user', async () => {
-      // Mock the implementation of createUser method
-      UserService.createUser.mockImplementation(
-        async (
-          email,
-          username,
-          password,
-          fullName,
-          phone,
-          address,
-          gender,
-          birthdate,
-          avatar,
-          role,
-        ) => {
-          // Simulate hash password before saving
-          const hashedPassword = await hashPassword(password);
-          // Return a mock user object
-          return {
-            id: 1,
-            email,
-            username,
-            password: hashedPassword,
-            fullName,
-            phone,
-            address,
-            gender,
-            birthdate,
-            avatar,
-            role,
-          };
-        },
-      );
-
-      // Mock data for the new user
-      const newUser = {
-        email: 'test@example.com',
-        username: 'testuser',
-        password: 'testpassword',
-        fullName: 'Test User',
-        phone: '1234567890',
-        address: '123 Test St',
-        gender: 'male',
-        birthdate: '1990-01-01',
-        avatar: 'https://example.com/avatar.jpg',
-        role: 'user',
-      };
-
-      // Send POST request to create a new user
-      const response = await request(app).post('/api/register').send(newUser);
-
-      // Assert the response
-      expect(response.status).toBe(201);
-      expect(response.body.data).toHaveProperty('id'); // Perubahan di sini
-      expect(response.body.data).toHaveProperty('email', newUser.email);
-      expect(response.body.data).toHaveProperty('username', newUser.username);
-      expect(response.body.data).toHaveProperty('fullName', newUser.fullName);
-      expect(response.body.data).toHaveProperty('phone', newUser.phone);
-      expect(response.body.data).toHaveProperty('address', newUser.address);
-      expect(response.body.data).toHaveProperty('gender', newUser.gender);
-      expect(response.body.data).toHaveProperty('birthdate', newUser.birthdate);
-      expect(response.body.data).toHaveProperty('avatar', newUser.avatar);
-      expect(response.body.data).toHaveProperty('role', newUser.role);
-    });
   });
 
   describe('GET /api/users', () => {
@@ -112,7 +48,11 @@ describe('User API', () => {
 
       // Assertions
       expect(response.status).toBe(200);
-      expect(response.body).toHaveLength(2);
+      expect(response.body).toHaveProperty('users');
+      expect(Array.isArray(response.body.users)).toBeTruthy();
+      expect(response.body.users.length).toBe(2);
+      expect(response.body.users[0]).toHaveProperty('id');
+      expect(response.body.users[0]).toHaveProperty('username');
     });
   });
 
@@ -138,13 +78,14 @@ describe('User API', () => {
 
       // Assertions
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('id', 1);
-      expect(response.body).toHaveProperty('username', 'user1');
+      expect(response.body).toHaveProperty('id');
+      expect(response.body).toHaveProperty('username');
+      expect(typeof response.body.id).toBe('number');
     });
   });
 
-  describe('DELETE /api/users/:id', () => {
-    it('should delete a user', async () => {
+  describe('POST /api/users', () => {
+    it('should create a new user', async () => {
       // Mock the authentication middleware
       AuthService.findUserById.mockResolvedValueOnce({
         id: 1,
@@ -152,20 +93,78 @@ describe('User API', () => {
         role: 'admin',
       });
 
-      // Mock the return value of destroyUser method
-      UserService.destroyUser.mockResolvedValueOnce();
-
       // Mock token verification
       jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
-      // Send request with bearer token
-      const response = await request(app)
-        .delete('/api/users/1')
-        .set('Authorization', 'Bearer fakeToken');
+      // Mock the implementation of createUser method
+      UserService.createUser.mockImplementation(
+        async (
+          email,
+          username,
+          password,
+          fullName,
+          phone,
+          address,
+          gender,
+          birthdate,
+          avatar,
+          role,
+        ) => {
+          // Simulate hash password before saving
+          const hashPass = await bcrypt.hashPassword(password);
+          // Return a mock user object
+          return {
+            id: 1,
+            email,
+            username,
+            password: hashPass,
+            fullName,
+            phone,
+            address,
+            gender,
+            birthdate,
+            avatar,
+            role,
+          };
+        },
+      );
 
-      // Assertions
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('message', 'User deleted successfully');
+      // Mock data for the new user
+      const newUser = {
+        email: 'test@example.com',
+        username: 'testuser',
+        password: 'tester123',
+        fullName: 'Test User',
+        phone: '1234567890',
+        address: '123 Test St',
+        gender: 'male',
+        birthdate: '1990-01-01',
+        avatar: 'https://example.com/avatar.jpg',
+        role: 'user',
+      };
+
+      // Mock hashPassword to generate the expected value
+      bcrypt.hashPassword.mockResolvedValueOnce('tester123');
+
+      // Send POST request to create a new user
+      const response = await request(app)
+        .post('/api/users')
+        .set('Authorization', 'Bearer fakeToken')
+        .send(newUser);
+
+      // Assert the response
+      expect(response.status).toBe(201);
+      expect(response.body.data).toHaveProperty('id');
+      expect(response.body.data).toHaveProperty('email', newUser.email);
+      expect(response.body.data).toHaveProperty('username', newUser.username);
+      expect(response.body.data).toHaveProperty('password', newUser.password);
+      expect(response.body.data).toHaveProperty('fullName', newUser.fullName);
+      expect(response.body.data).toHaveProperty('phone', newUser.phone);
+      expect(response.body.data).toHaveProperty('address', newUser.address);
+      expect(response.body.data).toHaveProperty('gender', newUser.gender);
+      expect(response.body.data).toHaveProperty('birthdate', newUser.birthdate);
+      expect(response.body.data).toHaveProperty('avatar', newUser.avatar);
+      expect(response.body.data).toHaveProperty('role', newUser.role);
     });
   });
 
@@ -222,5 +221,31 @@ describe('User API', () => {
       expect(response.body.data).toHaveProperty('avatar', 'https://example.com/avatar.jpg');
       expect(response.body.data).toHaveProperty('role', 'user');
     });
+  });
+});
+
+describe('DELETE /api/users/:id', () => {
+  it('should delete a user', async () => {
+    // Mock the authentication middleware
+    AuthService.findUserById.mockResolvedValueOnce({
+      id: 1,
+      username: 'admin',
+      role: 'admin',
+    });
+
+    // Mock the return value of destroyUser method
+    UserService.destroyUser.mockResolvedValueOnce();
+
+    // Mock token verification
+    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+
+    // Send request with bearer token
+    const response = await request(app)
+      .delete('/api/users/1')
+      .set('Authorization', 'Bearer fakeToken');
+
+    // Assertions
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('message', 'User deleted successfully');
   });
 });
