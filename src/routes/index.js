@@ -6,11 +6,11 @@ const userRoute = require('@routes/user.route');
 const checkoutRoute = require('@routes/checkout.route');
 const warehouseRoute = require('@routes/warehouse.route');
 const cartRoute = require('@routes/cart.route');
-const { authentication } = require('@middlewares/auth');
+// const { authentication } = require('@middlewares/auth');
 
 /**** Koleksi Route disini *******/
 router.use('/api', authRoute);
-router.use(authentication);
+// router.use(authentication);
 router.use('/api/products', productRoute);
 router.use('/api/categories', categoryRoute);
 router.use('/api/users', userRoute);
