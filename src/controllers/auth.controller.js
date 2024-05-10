@@ -20,7 +20,6 @@ class AuthController {
 
       const hashPass = bcrypt.hashPassword(password);
       const user = await AuthService.register(
-
         email,
         username,
         hashPass,
