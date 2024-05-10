@@ -82,6 +82,14 @@ class CheckoutController {
       next(e);
     }
   }
+  static async feedback(req, res, next) {
+    try {
+      const productCheckout = await CheckoutService.feedback(req.body);
+      res.status(200).json(successResponse(productCheckout, 'set feedback success'));
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = CheckoutController;

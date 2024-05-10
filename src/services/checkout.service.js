@@ -370,6 +370,25 @@ class CheckoutService {
       }
     }
   }
+
+  static async feedback({ checkoutId, feedback }) {
+    try {
+      await prisma.checkout.update({
+        where: {
+          id: checkoutId,
+        },
+        data: {
+          status: feedback,
+        },
+      });
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to set feedback checkout', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = CheckoutService;

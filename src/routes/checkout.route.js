@@ -5,6 +5,7 @@ router.get('/', CheckoutController.getAll);
 
 router.post('/action', CheckoutController.action);
 router.post('/send', CheckoutController.send);
+router.post('/feedback', CheckoutController.feedback);
 router.get('/:id', CheckoutController.getDetail);
 
 router.post('/', CheckoutController.add);
