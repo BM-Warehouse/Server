@@ -45,12 +45,11 @@ class AuthMiddleware {
       }
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError(
-          'Oops, something went wrong',
-          `An error occurred: ${e.message}`,
+        next(
+          new InternalServerError('Oops, something went wrong', `An error occurred: ${e.message}`),
         );
       } else {
-        throw e;
+        next(e);
       }
     }
   }
