@@ -1,4 +1,10 @@
 const prisma = require('@libs/prisma');
+const {
+  InternalServerError,
+  ClientError,
+  NotFoundError,
+  ConflictError,
+} = require('@exceptions/error.excecptions');
 
 class UserService {
   static async getAllUsers({ page, limit }) {
@@ -10,7 +16,11 @@ class UserService {
 
       return users;
     } catch (e) {
-      throw new e();
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Oops, something went wrong', e.message);
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -21,9 +31,17 @@ class UserService {
           id: +id,
         },
       });
+      if (!user) {
+        throw new NotFoundError('No user found', `There is no user with id ${id}`);
+      }
+
       return user;
     } catch (e) {
-      throw new e();
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Oops, something went wrong', e.message);
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -40,6 +58,19 @@ class UserService {
     role,
   ) {
     try {
+      const foundUser = await prisma.user.findFirst({
+        where: {
+          OR: [{ email }, { username }],
+        },
+      });
+
+      if (foundUser) {
+        throw new ConflictError(
+          'Data conflict of user',
+          'The user with email or username already exists!',
+        );
+      }
+
       const user = await prisma.user.create({
         data: {
           email,
@@ -56,7 +87,11 @@ class UserService {
       });
       return user;
     } catch (e) {
-      throw new e();
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Oops, something went wrong', e.message);
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -73,6 +108,11 @@ class UserService {
     role,
   ) {
     try {
+      const foundUser = await this.getDetailUser(id);
+      if (!foundUser) {
+        throw new NotFoundError('No user found', `There is no user with id ${id}`);
+      }
+
       const user = await prisma.user.update({
         where: {
           id: +id,
@@ -92,19 +132,33 @@ class UserService {
 
       return user;
     } catch (e) {
-      throw new e();
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Oops, something went wrong', e.message);
+      } else {
+        throw e;
+      }
     }
   }
 
   static async destroyUser(id) {
     try {
-      await prisma.user.delete({
+      const foundUser = await this.getDetailUser(id);
+      if (!foundUser) {
+        throw new NotFoundError('No user found', `There is no user with id ${id}`);
+      }
+
+      const user = await prisma.user.delete({
         where: {
           id: +id,
         },
       });
+      return user;
     } catch (e) {
-      throw new e();
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Oops, something went wrong', e.message);
+      } else {
+        throw e;
+      }
     }
   }
 }
