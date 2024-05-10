@@ -24,17 +24,16 @@ class CartService {
         },
       });
       return carts;
-      // const carts = await prisma.cart.findMany();
     } catch (err) {
       console.log(err);
     }
   }
 
-  static async fetchCart(userId) {
-    console.log(userId, '<<<<<<<<<<<<<<');
+  static async showUserCart(userId) {
     try {
       const cart = await prisma.cart.findUnique({
-        where: { userId }, // Menggunakan userId sebagai kunci pencarian
+        // Menggunakan userId sebagai kunci pencarian
+        where: { userId },
         include: {
           ProductCart: {
             include: {
@@ -49,15 +48,93 @@ class CartService {
     }
   }
 
-  static async deleteCartProduct(params) {
+  static async addProductToCart(payload) {
     try {
-      console.log(params);
-      // const { orderCartId } = params;
+      console.log(payload);
+      console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>');
+      const { id, product } = payload;
+      await prisma.$transaction(async (tx) => {
+        // Mengecek cart user atau membuat cart user
+        const cart = await tx.cart.findUnique({
+          where: { userId: id },
+        });
+        if (product) {
+          const { id: productId, price, quantity } = product;
+
+          // Mengecek apakah produk sudah ada di cart berdasarkan id produk
+          const existingProductCart = await tx.productCart.findFirst({
+            where: {
+              productId,
+              cartId: cart.id,
+            },
+          });
+          if (existingProductCart) {
+            // Jika produk sudah ada di cart, maka hanya menambahkan quantity
+            await tx.productCart.update({
+              where: {
+                productId_cartId: {
+                  productId: existingProductCart.productId,
+                  cartId: existingProductCart.cartId,
+                },
+              },
+              data: { productPrice: price, quantityItem: quantity },
+            });
+          } else {
+            // Jika produk belum ada di cart, maka membuat produk baru
+            await tx.productCart.create({
+              data: {
+                productId,
+                cartId: cart.id,
+                quantity,
+                price,
+              },
+            });
+          }
+          // Mengabil data productCart dari Cart user
+          const productsCart = await tx.productCart.findMany({
+            where: { cartId: cart.id },
+          });
+
+          // Inisialisasi vriable untuk total price
+          let totalPrice = 0;
+
+          // Menghitung total price
+          productsCart.forEach((productCart) => {
+            totalPrice += productCart.productPrice * productCart.quantityItem;
+          });
+
+          // Update data Cart
+          await tx.cart.update({
+            where: { userId: id },
+            data: {
+              totalPrice,
+            },
+          });
+        }
+      });
+      return prisma.cart.findUnique({
+        where: { userId: id },
+        include: {
+          ProductCart: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  static async deleteCartProduct(payload) {
+    try {
       const productCartDeleted = await prisma.productCart.delete({
         where: {
           productId_cartId: {
-            cartId: +params.cartId,
-            productId: +params.productId,
+            // mengambil id cart berdasarkan id user login
+            cartId: +payload.userId,
+            productId: +payload.productCartId,
           },
         },
       });
