@@ -14,10 +14,20 @@ class UserService {
         take: limit,
       });
 
+      if (!users || users.length === 0) {
+        throw new NotFoundError(
+          'Users not found',
+          'No users found for the specified page and limit',
+        );
+      }
+
       return users;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Oops, something went wrong', e.message);
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
       } else {
         throw e;
       }
@@ -31,14 +41,18 @@ class UserService {
           id: +id,
         },
       });
+
       if (!user) {
-        throw new NotFoundError('No user found', `There is no user with id ${id}`);
+        throw new NotFoundError('User not found', `No user was found with the ID: ${id}`);
       }
 
       return user;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Oops, something went wrong', e.message);
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
       } else {
         throw e;
       }
@@ -85,10 +99,18 @@ class UserService {
           role,
         },
       });
+
+      if (!user) {
+        throw new NotFoundError('User not created', 'Failed to create user');
+      }
+
       return user;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Oops, something went wrong', e.message);
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
       } else {
         throw e;
       }
@@ -109,8 +131,9 @@ class UserService {
   ) {
     try {
       const foundUser = await this.getDetailUser(id);
+
       if (!foundUser) {
-        throw new NotFoundError('No user found', `There is no user with id ${id}`);
+        throw new NotFoundError('User not found', `No user was found with the ID: ${id}`);
       }
 
       const user = await prisma.user.update({
@@ -130,10 +153,17 @@ class UserService {
         },
       });
 
+      if (!user) {
+        throw new NotFoundError('User not updated', 'Failed to update user');
+      }
+
       return user;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Oops, something went wrong', e.message);
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
       } else {
         throw e;
       }
@@ -143,8 +173,9 @@ class UserService {
   static async destroyUser(id) {
     try {
       const foundUser = await this.getDetailUser(id);
+
       if (!foundUser) {
-        throw new NotFoundError('No user found', `There is no user with id ${id}`);
+        throw new NotFoundError('User not found', `No user was found with the ID: ${id}`);
       }
 
       const user = await prisma.user.delete({
@@ -152,10 +183,14 @@ class UserService {
           id: +id,
         },
       });
+
       return user;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Oops, something went wrong', e.message);
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
       } else {
         throw e;
       }

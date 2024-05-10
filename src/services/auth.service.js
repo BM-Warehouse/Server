@@ -1,4 +1,10 @@
 const prisma = require('@libs/prisma');
+const {
+  ConflictError,
+  InternalServerError,
+  ClientError,
+  NotFoundError,
+} = require('@exceptions/error.excecptions');
 
 class AuthService {
   static async register(
@@ -14,6 +20,19 @@ class AuthService {
     role,
   ) {
     try {
+      const foundUser = await prisma.user.findFirst({
+        where: {
+          OR: [{ email }, { username }],
+        },
+      });
+
+      if (foundUser) {
+        throw new ConflictError(
+          'Data conflict of user',
+          'The user with email or username already exists!',
+        );
+      }
+
       const user = await prisma.user.create({
         data: {
           email,
@@ -28,9 +47,21 @@ class AuthService {
           role,
         },
       });
+
+      if (!user) {
+        throw new NotFoundError('User not created', 'Failed to create user');
+      }
+
       return user;
     } catch (e) {
-      throw new e();
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -42,11 +73,18 @@ class AuthService {
         },
       });
       if (!foundUser) {
-        throw new Error('Usernotfound');
+        throw new NotFoundError('User not found', `No user was found with the ID: ${username}`);
       }
       return foundUser;
     } catch (e) {
-      throw new e();
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -58,11 +96,18 @@ class AuthService {
         },
       });
       if (!findById) {
-        throw new Error('Idnotfound');
+        throw new NotFoundError('User not found', `No user was found with the ID: ${id}`);
       }
       return findById;
     } catch (e) {
-      throw new e();
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
+      } else {
+        throw e;
+      }
     }
   }
 }
