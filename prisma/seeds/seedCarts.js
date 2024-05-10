@@ -1,13 +1,11 @@
 const prisma = require('@libs/prisma');
 
 const carts = [];
-const status = ['not checkouted', 'cheeckouted'];
 
 for (let i = 1; i <= 10; i++) {
     carts.push({
         userId: i,
-        totalPrice: ((i % 10) * 1000) + 1000,
-        status: status[i % 2]
+        totalPrice: 0,
     });
 }
 
