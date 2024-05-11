@@ -7,7 +7,11 @@ router.get('/:id', CategoryController.getProductsBasedOnCategory);
 
 router.post('/', CategoryController.addCategory);
 
+router.put('/set', CategoryController.setCategoryforProduct);
+
 router.put('/:id', CategoryController.editCategory);
+
+router.delete('/', CategoryController.removeProductCategory);
 
 router.delete('/:id', CategoryController.removeCategory);
 
