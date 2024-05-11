@@ -37,7 +37,7 @@ class CategoryService {
       return categories;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get all Product from db', e.message);
+        throw new InternalServerError('Fail to get all categories from db', e.message);
       } else {
         throw e;
       }
@@ -69,7 +69,7 @@ class CategoryService {
       }
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get all Product from db', e.message);
+        throw new InternalServerError('Fail to add category to db', e.message);
       } else {
         throw e;
       }
@@ -96,7 +96,7 @@ class CategoryService {
       });
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get all Product from db', e.message);
+        throw new InternalServerError('Fail to edit category from db', e.message);
       } else {
         throw e;
       }
@@ -115,7 +115,7 @@ class CategoryService {
       });
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get all Product from db', e.message);
+        throw new InternalServerError('Fail to remove category from db', e.message);
       } else {
         throw e;
       }
@@ -140,7 +140,10 @@ class CategoryService {
       return category;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to get all Product from db', e.message);
+        throw new InternalServerError(
+          'Fail to get all Product with specific category from db',
+          e.message,
+        );
       } else {
         throw e;
       }
@@ -154,7 +157,7 @@ class CategoryService {
           'Parameter is not complete',
           'productId and categoryId have to be provided',
         );
-      await prisma.productCategory.upsert({
+      const pc = await prisma.productCategory.upsert({
         where: {
           productId_categoryId: {
             productId,
@@ -167,9 +170,10 @@ class CategoryService {
           categoryId,
         },
       });
+      return pc;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e.message);
+        throw new InternalServerError('Fail to set category for product to db', e.message);
       } else {
         throw e;
       }
@@ -189,7 +193,7 @@ class CategoryService {
       return removed;
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError('Fail to delete Product to db', e.message);
+        throw new InternalServerError('Fail to delete category-product relation to db', e.message);
       } else {
         throw e;
       }
