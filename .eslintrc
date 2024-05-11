@@ -20,7 +20,7 @@
     "no-console":"warn",
     "max-len": [
       "error",
-      100
+      200
     ],
     "import/no-named-default": "off",
     "import/prefer-default-export": "off",
