@@ -34,7 +34,7 @@ class CartService {
   static async showUserCart(userId) {
     try {
       const cart = await prisma.cart.findUnique({
-        // Menggunakan userId sebagai kunci pencarian
+        // Menggunakan userId sebagai kunci pencarian.
         where: { userId },
         include: {
           ProductCart: {
