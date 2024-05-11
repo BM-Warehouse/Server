@@ -3,31 +3,53 @@
 const request = require('supertest');
 const app = require('../../app');
 const WarehouseService = require('@services/warehouse.service');
-const jwt = require('jsonwebtoken');
+const jwt = require('@libs/jwt.js');
 const bcrypt = require('@libs/bcrypt');
 const AuthService = require('@services/auth.service');
 
 // Mock UserService
-jest.mock('@services/user.service');
+jest.mock('@services/warehouse.service');
 
 // Mock the AuthService
 jest.mock('@services/auth.service');
 
 // Mock jwt verify token function
-jwt.verify = jest.fn();
+jwt.verifyToken = jest.fn();
 
 // Mock bcrypt hashPassword function
-bcrypt.hash = jest.fn();
+bcrypt.hashPassword = jest.fn();
 
 // Mock WarehouseService
 jest.mock('@services/warehouse.service');
 
 describe('WarehouseController', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
+
+    // Mock token verification
+    jwt.verifyToken.mockReturnValueOnce({
+      userId: 1,
+      cartId: 1,
+      username: 'admin',
+      role: 'admin',
+      iat: 1715447961,
+    });
   });
 
   describe('getAllWarehouses', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+
+      // Mock token verification
+      jwt.verifyToken.mockReturnValueOnce({
+        userId: 1,
+        cartId: 1,
+        username: 'admin',
+        role: 'admin',
+        iat: 1715447961,
+      });
+    });
+
     it('should return all warehouses', async () => {
       AuthService.findUserById.mockResolvedValueOnce({
         id: 1,
@@ -40,8 +62,6 @@ describe('WarehouseController', () => {
         { id: 2, name: 'Warehouse B' },
       ];
       WarehouseService.getAllWarehouses.mockResolvedValueOnce(warehouses);
-
-      jwt.verify.mockReturnValueOnce({ id: 1 });
 
       const response = await request(app)
         .get('/api/warehouses')
@@ -63,8 +83,6 @@ describe('WarehouseController', () => {
 
       const warehouse = { id: 1, name: 'Warehouse A' };
       WarehouseService.getWarehouseDetail.mockResolvedValueOnce(warehouse);
-
-      jwt.verify.mockReturnValueOnce({ id: 1 });
 
       const response = await request(app)
         .get('/api/warehouses/1')
@@ -91,8 +109,6 @@ describe('WarehouseController', () => {
         city: 'New York',
       };
       WarehouseService.addWarehouse.mockResolvedValueOnce(newWarehouse);
-
-      jwt.verify.mockReturnValueOnce({ id: 1 });
 
       const response = await request(app)
         .post('/api/warehouses')
@@ -127,8 +143,6 @@ describe('WarehouseController', () => {
       };
       WarehouseService.editWarehouse.mockResolvedValueOnce(updatedWarehouse);
 
-      jwt.verify.mockReturnValueOnce({ id: 1 });
-
       const response = await request(app)
         .put('/api/warehouses/1')
         .set('Authorization', 'Bearer fakeToken')
@@ -156,8 +170,6 @@ describe('WarehouseController', () => {
         role: 'admin',
       });
       WarehouseService.deleteWarehouse.mockResolvedValueOnce();
-
-      jwt.verify.mockReturnValueOnce({ id: 1 });
 
       const response = await request(app)
         .delete('/api/warehouses/1')

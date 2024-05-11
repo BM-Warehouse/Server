@@ -26,8 +26,17 @@ const generateRandomData = () => ({
 });
 
 describe('Category API', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks(); // Clear mock calls after each test
+
+    // Mock token verification
+    jwt.verifyToken.mockReturnValueOnce({
+      userId: 1,
+      cartId: 1,
+      username: 'admin',
+      role: 'admin',
+      iat: 1715447961,
+    });
   });
 
   // Test to get all categories
@@ -38,9 +47,6 @@ describe('Category API', () => {
       username: 'admin',
       role: 'admin',
     });
-
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     it('should return all categories', async () => {
       // Mock the return value of getAllCategories method
@@ -66,7 +72,7 @@ describe('Category API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Mock the addCategory method to resolve
       CategoryService.addCategory.mockResolvedValue();
@@ -90,7 +96,7 @@ describe('Category API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Mock the addCategory method to throw an error
       CategoryService.addCategory.mockRejectedValue(new Error('Required fields are missing'));
@@ -116,7 +122,7 @@ describe('Category API', () => {
     });
 
     // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+    // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
     it('should edit a category', async () => {
       // Mock the editCategory method to resolve
       CategoryService.editCategory.mockResolvedValue();
@@ -141,7 +147,7 @@ describe('Category API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
       // Mock the editCategory method to throw an error
       CategoryService.editCategory.mockRejectedValue(new Error('Category not found'));
 
@@ -167,7 +173,7 @@ describe('Category API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
       // Mock the removeCategory method to resolve
       CategoryService.removeCategory.mockResolvedValue();
 
@@ -189,7 +195,7 @@ describe('Category API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Mock the removeCategory method to throw an error
       CategoryService.removeCategory.mockRejectedValue(new Error('Category not found'));
@@ -216,7 +222,7 @@ describe('Category API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Mock the getProductByCategory method to resolve
       const mockedProducts = Array.from({ length: 5 }, generateRandomData);
@@ -239,7 +245,7 @@ describe('Category API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Mock the getProductByCategory method to throw an error
       CategoryService.getProductByCategory.mockRejectedValue(new Error('Category not found'));
