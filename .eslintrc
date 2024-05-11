@@ -1,20 +1,15 @@
 {
   "parserOptions": {
     "ecmaVersion": "latest",
-    "sourceType": "module"
+    "sourceType": "module",
   },
-  "extends": [
-    "eslint:recommended",
-    "prettier"
-  ],
-  "plugins": [
-    "import"
-  ],
+  "extends": ["eslint:recommended", "prettier"],
+  "plugins": ["import"],
   "env": {
     "node": true,
     "browser": true,
     "commonjs": true,
-    "es2021": true
+    "es2021": true,
   },
   "rules": {
     "no-console":"warn",

@@ -19,8 +19,16 @@ jwt.verifyToken = jest.fn();
 bcrypt.hashPassword = jest.fn();
 
 describe('Checkout API', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks(); // Clear mock calls after each test
+    // Mock token verification
+    jwt.verifyToken.mockReturnValueOnce({
+      userId: 1,
+      cartId: 1,
+      username: 'admin',
+      role: 'admin',
+      iat: 1715447961,
+    });
   });
 
   it('should return status code 200 if get all checkouts', async () => {
@@ -30,9 +38,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     CheckoutService.getAll.mockResolvedValueOnce([{ id: 1, name: 'Checkout 1' }]);
 
@@ -49,8 +54,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     CheckoutService.getAll.mockRejectedValueOnce(new Error('Internal Server Error'));
 
@@ -66,8 +69,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     const checkoutData = { id: 1, name: 'Checkout 1' };
     CheckoutService.getDetail.mockResolvedValueOnce(checkoutData);
@@ -85,8 +86,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     CheckoutService.getDetail.mockResolvedValueOnce(null);
 
@@ -104,8 +103,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     const newCheckoutData = { name: 'New Checkout' };
     CheckoutService.add.mockResolvedValueOnce({ id: 1, ...newCheckoutData });
@@ -126,8 +123,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     const updatedCheckoutData = { id: 1, name: 'Updated Checkout' };
     CheckoutService.update.mockResolvedValueOnce(updatedCheckoutData);
@@ -148,8 +143,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     CheckoutService.update.mockResolvedValueOnce(null);
 
@@ -168,8 +161,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
     CheckoutService.remove.mockResolvedValueOnce();
 
     const res = await request(app)
@@ -186,8 +177,6 @@ describe('Checkout API', () => {
       username: 'admin',
       role: 'admin',
     });
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
     CheckoutService.remove.mockResolvedValueOnce(null);
 
     const res = await request(app)
