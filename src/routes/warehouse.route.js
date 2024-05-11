@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const WarehouseController = require('@controllers/warehouse.controller');
+const { adminAuthorization } = require('@src/middlewares/auth');
 
+router.use(adminAuthorization);
 router.get('/', WarehouseController.getAllWarehouses);
 router.get('/:id', WarehouseController.getWarehouseDetail);
 router.post('/', WarehouseController.addWarehouse);

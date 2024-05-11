@@ -110,6 +110,29 @@ class AuthService {
       }
     }
   }
+
+  static async findCartbyUserId(id) {
+    try {
+      const findCart = await prisma.cart.findUnique({
+        where: {
+          userId: +id,
+        },
+      });
+      if (!findCart) {
+        throw new NotFoundError('Cart is not found', `Cart with userId ${id} is not exist.`);
+      }
+      return findCart;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = AuthService;

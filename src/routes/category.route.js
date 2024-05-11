@@ -1,9 +1,12 @@
 const CategoryController = require('@src/controllers/category.controller');
+const { adminAuthorization } = require('@src/middlewares/auth');
 const router = require('express').Router();
 
 router.get('/', CategoryController.getAllCategories);
 
 router.get('/:id', CategoryController.getProductsBasedOnCategory);
+
+router.use(adminAuthorization);
 
 router.post('/', CategoryController.addCategory);
 
