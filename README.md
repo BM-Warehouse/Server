@@ -1,5 +1,9 @@
 ## How to run in your local machine
 
+[![Deploy to cloud with Docker image](https://github.com/BM-Warehouse/Server/actions/workflows/deploy.yml/badge.svg)](https://github.com/BM-Warehouse/Server/actions/workflows/deploy.yml)
+
+[![check linter and unit tests](https://github.com/BM-Warehouse/Server/actions/workflows/lintCheck.yml/badge.svg)](https://github.com/BM-Warehouse/Server/actions/workflows/lintCheck.yml)
+
 1. Clone the repository
 2. Make sure you have `Node.js v20.10.0` installed
 3. Make sure you have `pnpm` installed

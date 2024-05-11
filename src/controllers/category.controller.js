@@ -1,4 +1,5 @@
 const { getPaginationStatus } = require('@src/libs/pagination');
+const { successResponse } = require('@src/responses/responses');
 const CategoryService = require('@src/services/category.service');
 
 const DEFAULT_PAGE = 1;
@@ -7,14 +8,13 @@ const DEFAULT_LIMIT = 10;
 class CategoryController {
   static async getAllCategories(req, res, next) {
     try {
-      let { page, limit } = req.query;
-      if (!page) page = DEFAULT_PAGE;
-      if (!limit) limit = DEFAULT_LIMIT;
-      page = +page;
-      limit = +limit;
-      const categories = await CategoryService.getAllCategories({ page, limit });
+      let payload = req.query;
+      payload.page = +payload.page || DEFAULT_PAGE;
+      payload.limit = +payload.limit || DEFAULT_LIMIT;
+
+      const categories = await CategoryService.getAllCategories(payload);
       const totalCount = await CategoryService.getAllCount();
-      const pagination = getPaginationStatus(page, limit, totalCount);
+      const pagination = getPaginationStatus(payload.page, payload.limit, totalCount);
       res
         .status(200)
         .json({ message: 'Get all categories success', categories: categories, pagination });
@@ -25,8 +25,8 @@ class CategoryController {
 
   static async addCategory(req, res, next) {
     try {
-      const { categoryName } = req.body;
-      await CategoryService.addCategory(categoryName);
+      const { name } = req.body;
+      await CategoryService.addCategory(name);
       res.status(201).json({ message: 'category added successfully' });
     } catch (e) {
       next(e);
@@ -60,6 +60,26 @@ class CategoryController {
       const categoryId = +id;
       const category = await CategoryService.getProductByCategory(categoryId);
       res.status(200).json({ message: 'OK', category });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async setCategoryforProduct(req, res, next) {
+    try {
+      const { productId, categoryId } = req.body;
+      const category = await CategoryService.setCategoryforProduct(productId, categoryId);
+      res.status(201).json(successResponse({ category }, 'Set category successfully'));
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async removeProductCategory(req, res, next) {
+    try {
+      const { productId, categoryId } = req.body;
+      const removed = await CategoryService.removeProductCategory(productId, categoryId);
+      res.json(successResponse({ removed }, 'remove product-category relation success'));
     } catch (e) {
       next(e);
     }

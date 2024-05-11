@@ -35,7 +35,7 @@ class WarehouseController {
     try {
       const { name, address, city } = req.body;
       await WarehouseService.addWarehouse(name, address, city);
-      res.status(201).json({ message: 'Added a new warehouse successfully!' });
+      res.status(201).json({ data: req.body, message: 'Added a new warehouse successfully!' });
     } catch (e) {
       next(e);
     }
