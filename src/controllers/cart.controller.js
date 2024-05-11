@@ -1,3 +1,4 @@
+const { NotFoundError, BadRequest } = require('@src/exceptions/error.excecptions');
 const { successResponse } = require('@src/responses/responses');
 const CartService = require('@src/services/cart.service');
 
@@ -6,7 +7,10 @@ class CartController {
   static async getAllCarts(req, res, next) {
     try {
       const carts = await CartService.getAllCarts();
-      res.status(200).json(successResponse({ carts }, 'ok'));
+
+      res
+        .status(200)
+        .json(successResponse({ carts }, 'Carts for all users successfully retrieved'));
     } catch (e) {
       next(e);
     }
@@ -14,8 +18,15 @@ class CartController {
 
   static async showUserCart(req, res, next) {
     try {
-      const cart = await CartService.showUserCart(+req.loggedUser.id);
-      res.status(200).json(successResponse({ cart }, 'This is the Cart'));
+      const { id } = req.loggedUser;
+
+      if (!id) {
+        throw new NotFoundError('User ID not found', 'No user was found with the specified ID');
+      }
+
+      const cart = await CartService.showUserCart(+id);
+
+      res.status(200).json(successResponse({ cart }, 'Cart successfully retrieved'));
     } catch (e) {
       next(e);
     }
@@ -23,24 +34,32 @@ class CartController {
 
   static async addProductToCart(req, res, next) {
     try {
+      if (!req.body.product) {
+        throw new BadRequest('Invalid Request', 'No data provided in the request body');
+      }
+
       const cartUser = await CartService.addProductToCart({ ...req.loggedUser, ...req.body });
-      return res.json({
-        status: 'success',
-        message: 'Item added successfully',
-        data: { cart: cartUser },
-      });
+
+      res
+        .status(200)
+        .json(successResponse({ cart: cartUser }, 'Product successfully added to the cart'));
     } catch (e) {
       next(e);
     }
   }
   static async deleteCartProduct(req, res, next) {
     try {
+      if (isNaN(req.params.id)) {
+        throw new BadRequest('Invalid parameter id', 'The provided product cart id is not valid');
+      }
+
       const payload = {
         productCartId: +req.params.id,
         userId: +req.loggedUser.id,
       };
 
       const item = await CartService.deleteCartProduct(payload);
+
       res.status(200).json(successResponse(item, 'Product item deleted successfully'));
     } catch (e) {
       next(e);
@@ -48,14 +67,17 @@ class CartController {
   }
   static async resetCartToDefault(req, res, next) {
     try {
-      const item = await CartService.resetCartToDefault(+req.loggedUser.id);
-      // eslint-disable-next-line max-len
-      // res.status(200).json(successResponse(item, 'All item on the cart are deleted successfully'));
-      return res.json({
-        status: 'success',
-        message: 'All item on the cart are deleted successfully',
-        data: { cart: item },
-      });
+      const { id } = req.loggedUser;
+
+      if (!id) {
+        throw new NotFoundError('User ID not found', 'No user was found with the specified ID');
+      }
+
+      const item = await CartService.resetCartToDefault(+id);
+
+      res
+        .status(200)
+        .json(successResponse({ cart: item }, 'All products removed from the user cart'));
     } catch (e) {
       next(e);
     }
