@@ -20,20 +20,20 @@ async function updateProductStock() {
   for (const product of products) {
     let productWarehouses = await prisma.productWarehouse.findMany({
       where: {
-        productId: product.id
-      }
-    })
+        productId: product.id,
+      },
+    });
 
     let totalStock = productWarehouses.reduce((sum, item) => sum + item.quantity, 0);
 
     const a = await prisma.product.update({
       where: {
-        id: product.id
+        id: product.id,
       },
       data: {
-        totalStock
-      }
-    })
+        totalStock,
+      },
+    });
   }
 }
 
