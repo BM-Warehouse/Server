@@ -1,6 +1,7 @@
 const CheckoutService = require('@services/checkout.service');
 const { BadRequest } = require('@exceptions/error.excecptions');
 const { successResponse } = require('@responses/responses');
+const { getPaginationStatus } = require('@src/libs/pagination');
 
 const DEFAULT_LIMIT = 10;
 const DEFAULT_PAGE = 1;
@@ -21,7 +22,8 @@ class CheckoutController {
         page,
         limit,
       });
-      res.status(200).json(successResponse({ checkouts }, 'ok'));
+      const pagination = getPaginationStatus(page, limit, checkouts.count);
+      res.status(200).json({ message: 'ok', checkouts, pagination });
     } catch (e) {
       next(e);
     }

@@ -40,7 +40,10 @@ class CategoryService {
           `Categories contained '${contains}' are not available`,
         );
       }
-      return categories;
+      const count = await prisma.category.count({
+        where,
+      });
+      return { categories, count };
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to get all categories from db', e.message);
@@ -50,28 +53,30 @@ class CategoryService {
     }
   }
 
-  static async getAllCount() {
-    const categoriesCount = await prisma.category.count();
-    return categoriesCount;
-  }
-
-  static async addCategory(categoryName, categoryDescription, categoryImageUrl) {
+  static async addCategory({ name, description, imageUrl }) {
     try {
+      if (!name || !description || !imageUrl) {
+        throw new BadRequest(
+          'Input is invalid',
+          'Name, description, and imageUrl must not be empty!',
+        );
+      }
       const categoryCheck = await prisma.category.findFirst({
         where: {
-          name: categoryName,
+          name,
         },
       });
-      if (!categoryCheck) {
-        await prisma.category.create({
+      if (categoryCheck) {
+        throw new ConflictError('Category is already exist');
+      } else {
+        const newCategory = await prisma.category.create({
           data: {
-            name: categoryName,
-            description: categoryDescription,
-            imageUrl: categoryImageUrl,
+            name,
+            description,
+            imageUrl,
           },
         });
-      } else {
-        throw new ConflictError('Category is already exist');
+        return newCategory;
       }
     } catch (e) {
       if (!(e instanceof ClientError)) {
@@ -90,7 +95,7 @@ class CategoryService {
           'Id, name, description, and image should not be empty!',
         );
       }
-      await prisma.category.update({
+      const editedCategory = await prisma.category.update({
         where: {
           id: +id,
         },
@@ -100,6 +105,7 @@ class CategoryService {
           imageUrl,
         },
       });
+      return editedCategory;
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to edit category from db', e.message);
@@ -111,14 +117,21 @@ class CategoryService {
 
   static async removeCategory(id) {
     try {
-      if (!id) {
-        throw new NotFoundError('Category not found', `Category with id ${id} is not available`);
-      }
-      await prisma.category.delete({
+      const removeCategory = await prisma.category.findUnique({
         where: {
           id: +id,
         },
       });
+      if (!removeCategory) {
+        throw new NotFoundError('Category Not Found', `Category with id ${id} is not available`);
+      } else {
+        const removed = await prisma.category.delete({
+          where: {
+            id: +id,
+          },
+        });
+        return removed;
+      }
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to remove category from db', e.message);
@@ -143,6 +156,12 @@ class CategoryService {
           },
         },
       });
+      if (!category[0]) {
+        throw new NotFoundError(
+          'Products list in this category not found',
+          `Category with id ${categoryId} is not available`,
+        );
+      }
       return category;
     } catch (e) {
       if (!(e instanceof ClientError)) {
@@ -158,11 +177,28 @@ class CategoryService {
 
   static async setCategoryforProduct(productId, categoryId) {
     try {
-      if (!productId || !categoryId)
+      if (!productId || !categoryId) {
         throw new BadRequest(
           'Parameter is not complete',
           'productId and categoryId have to be provided',
         );
+      }
+      const categoryCheck = await prisma.category.findUnique({
+        where: {
+          id: categoryId,
+        },
+      });
+      const productCheck = await prisma.product.findUnique({
+        where: {
+          id: productId,
+        },
+      });
+      if (!categoryCheck || !productCheck) {
+        throw new NotFoundError(
+          'Not found',
+          `Product ${productId} or category ${categoryId} is not available`,
+        );
+      }
       const pc = await prisma.productCategory.upsert({
         where: {
           productId_categoryId: {
@@ -186,8 +222,28 @@ class CategoryService {
     }
   }
 
-  static async removeProductCategory(productId, categoryId) {
+  static async removeProductCategory({ productId, categoryId }) {
     try {
+      if (!productId || !categoryId) {
+        throw new BadRequest(
+          'Parameter is not complete',
+          'productId and categoryId have to be provided',
+        );
+      }
+      const productCategory = await prisma.productCategory.findUnique({
+        where: {
+          productId_categoryId: {
+            productId,
+            categoryId,
+          },
+        },
+      });
+      if (!productCategory) {
+        throw new NotFoundError(
+          'Not found',
+          `Product with id ${productId} and category with id ${categoryId} have no relation.`,
+        );
+      }
       const removed = await prisma.productCategory.delete({
         where: {
           productId_categoryId: {

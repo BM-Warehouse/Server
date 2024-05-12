@@ -7,7 +7,8 @@ class WarehouseService {
         skip: (page - 1) * limit,
         take: limit,
       });
-      return warehouses;
+      const count = await prisma.warehouse.count();
+      return { warehouses, count };
     } catch (e) {
       throw new e();
     }

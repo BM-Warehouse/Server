@@ -33,19 +33,35 @@ class AuthService {
         );
       }
 
-      const user = await prisma.user.create({
-        data: {
-          email,
-          username,
-          password,
-          fullName,
-          phone,
-          address,
-          gender,
-          birthdate: new Date(birthdate),
-          avatar,
-          role,
-        },
+      const user = prisma.$transaction(async (tx) => {
+        let user = await tx.user.create({
+          data: {
+            email,
+            username,
+            password,
+            fullName,
+            phone,
+            address,
+            gender,
+            birthdate: new Date(birthdate),
+            avatar,
+            role,
+          },
+        });
+
+        const cart = await tx.cart.create({
+          data: {
+            totalPrice: 0,
+            userId: user.id,
+          },
+        });
+
+        user = {
+          ...user,
+          cartId: cart.id,
+        };
+
+        return user;
       });
 
       if (!user) {

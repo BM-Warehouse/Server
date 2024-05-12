@@ -1,6 +1,7 @@
 const ProductService = require('@services/product.service');
 const { BadRequest } = require('@exceptions/error.excecptions');
 const { successResponse } = require('@responses/responses');
+const { getPaginationStatus } = require('@src/libs/pagination');
 
 const DEFAULT_LIMIT = 10;
 const DEFAULT_PAGE = 1;
@@ -17,8 +18,9 @@ class ProductController {
       filter.page = +filter.page || DEFAULT_PAGE;
       filter.limit = +filter.limit || DEFAULT_LIMIT;
 
-      const products = await ProductService.getAll(filter);
-      res.status(200).json(successResponse({ products }, 'ok'));
+      const { products, count } = await ProductService.getAll(filter);
+      const pagination = getPaginationStatus(filter.page, filter.limit, count);
+      res.status(200).json(successResponse({ products, pagination }, 'ok'));
     } catch (e) {
       next(e);
     }

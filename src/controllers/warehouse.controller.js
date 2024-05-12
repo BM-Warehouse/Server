@@ -1,4 +1,5 @@
 const WarehouseService = require('@services/warehouse.service');
+const { getPaginationStatus } = require('@src/libs/pagination');
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -15,7 +16,10 @@ class WarehouseController {
         page,
         limit,
       });
-      res.status(200).json(warehouses);
+
+      const pagination = getPaginationStatus(page, limit, warehouses.count);
+
+      res.status(200).json({ message: 'ok', warehouses, pagination });
     } catch (e) {
       next(e);
     }
