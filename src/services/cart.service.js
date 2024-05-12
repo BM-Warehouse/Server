@@ -61,19 +61,19 @@ class CartService {
 
   static async addProductToCart(payload) {
     try {
-      const { id, product } = payload;
+      const { userId, product } = payload;
       await prisma.$transaction(async (tx) => {
         // Mengecek cart user atau membuat cart user
         let cart = await tx.cart.findUnique({
-          where: { userId: id },
+          where: { userId },
         });
 
         if (!cart) {
           cart = await tx.cart.create({
             data: {
-              id,
-              userId: id,
-              status: 'not checkouted',
+              id: userId,
+              userId,
+              // status: 'not checkouted',
               totalPrice: 0,
             },
           });
@@ -148,7 +148,7 @@ class CartService {
 
           // Update data Cart
           await tx.cart.update({
-            where: { userId: id },
+            where: { userId },
             data: {
               totalPrice,
             },
@@ -156,7 +156,7 @@ class CartService {
         }
       });
       return prisma.cart.findUnique({
-        where: { userId: id },
+        where: { userId },
         include: {
           ProductCart: {
             include: {
@@ -166,6 +166,7 @@ class CartService {
         },
       });
     } catch (err) {
+      // console.log(err);
       if (!(err instanceof ClientError)) {
         throw new InternalServerError(
           'Oops, something went wrong',
@@ -179,6 +180,19 @@ class CartService {
 
   static async deleteCartProduct(payload) {
     try {
+      // console.log(payload);
+
+      const cart = await prisma.cart.findUnique({
+        where: { userId: +payload.userId },
+      });
+
+      if (!cart) {
+        throw new NotFoundError(
+          'Cart not found',
+          `There is no cart associated with user id ${payload.userId}`,
+        );
+      }
+
       const productCart = await prisma.productCart.findUnique({
         where: {
           productId_cartId: {
@@ -190,23 +204,35 @@ class CartService {
 
       if (!productCart) {
         throw new NotFoundError(
-          'No product found',
-          `There is no product with id ${payload.productCartId}`,
+          'ProductCart not found',
+          `There is no productCart with id ${payload.productCartId}`,
         );
       }
+
+      const previousTotalPrice = cart.totalPrice;
 
       const productCartDeleted = await prisma.productCart.delete({
         where: {
           productId_cartId: {
-            // mengambil id cart berdasarkan id user login
             cartId: +payload.userId,
             productId: +payload.productCartId,
           },
         },
       });
 
+      const updatedTotalPrice =
+        previousTotalPrice - productCartDeleted.quantityItem * productCartDeleted.productPrice;
+
+      await prisma.cart.update({
+        where: { userId: +payload.userId },
+        data: {
+          totalPrice: updatedTotalPrice,
+        },
+      });
+
       return productCartDeleted;
     } catch (err) {
+      console.log(err);
       if (!(err instanceof ClientError)) {
         throw new InternalServerError('Fail to delete Product Cart to db', err.message);
       } else {
@@ -222,7 +248,7 @@ class CartService {
           where: { userId },
           data: {
             totalPrice: 0,
-            status: 'not checkouted',
+            // status: 'not checkouted',
           },
           include: {
             user: true,
@@ -245,6 +271,7 @@ class CartService {
         },
       });
     } catch (err) {
+      // console.log(err);
       if (!(err instanceof ClientError)) {
         throw new InternalServerError('Fail to reset product cart user', err.message);
       } else {

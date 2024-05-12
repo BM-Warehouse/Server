@@ -131,11 +131,11 @@ class UserController {
 
   static async getLoginUser(req, res, next) {
     try {
-      const { id } = req.loggedUser;
+      const { userId } = req.loggedUser;
 
-      const me = await UserService.getLoginUser(+id);
+      const me = await UserService.getLoginUser(+userId);
 
-      res.status(200).json(successResponse({ me }, 'Cart successfully retrieved'));
+      res.status(200).json(successResponse({ me }, 'Data login user successfully retrieved'));
     } catch (e) {
       next(e);
     }

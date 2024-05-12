@@ -389,6 +389,24 @@ class CheckoutService {
       }
     }
   }
+
+  static async getUserCheckouts(userId) {
+    try {
+      const checkouts = await prisma.checkout.findMany({
+        where: {
+          userId,
+        },
+      });
+
+      return checkouts;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to get user checkouts', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = CheckoutService;

@@ -18,13 +18,13 @@ class CartController {
 
   static async showUserCart(req, res, next) {
     try {
-      const { id } = req.loggedUser;
+      const { userId } = req.loggedUser;
 
-      if (!id) {
+      if (!userId) {
         throw new NotFoundError('User ID not found', 'No user was found with the specified ID');
       }
 
-      const cart = await CartService.showUserCart(+id);
+      const cart = await CartService.showUserCart(+userId);
 
       res.status(200).json(successResponse({ cart }, 'Cart successfully retrieved'));
     } catch (e) {
@@ -55,7 +55,7 @@ class CartController {
 
       const payload = {
         productCartId: +req.params.id,
-        userId: +req.loggedUser.id,
+        userId: +req.loggedUser.userId,
       };
 
       const item = await CartService.deleteCartProduct(payload);
@@ -67,13 +67,13 @@ class CartController {
   }
   static async resetCartToDefault(req, res, next) {
     try {
-      const { id } = req.loggedUser;
+      const { userId } = req.loggedUser;
 
-      if (!id) {
+      if (!userId) {
         throw new NotFoundError('User ID not found', 'No user was found with the specified ID');
       }
 
-      const item = await CartService.resetCartToDefault(+id);
+      const item = await CartService.resetCartToDefault(+userId);
 
       res
         .status(200)

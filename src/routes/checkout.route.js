@@ -4,6 +4,8 @@ const router = require('express').Router();
 
 router.get('/', CheckoutController.getAll);
 
+router.get('/me', CheckoutController.getUserCheckouts);
+
 router.post('/action', userAuthorization, CheckoutController.action);
 
 router.post('/send', adminAuthorization, CheckoutController.send);

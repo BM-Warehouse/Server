@@ -90,6 +90,20 @@ class CheckoutController {
       next(e);
     }
   }
+
+  static async getUserCheckouts(req, res, next) {
+    try {
+      const { userId } = req.loggedUser;
+
+      const checkoutsUser = await CheckoutService.getUserCheckouts(+userId);
+
+      res
+        .status(200)
+        .json(successResponse({ checkoutsUser }, 'Data all user checkouts successfully retrieved'));
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = CheckoutController;
