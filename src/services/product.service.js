@@ -78,7 +78,11 @@ class ProductService {
         take: limit,
       });
 
-      return products;
+      const count = await prisma.product.count({
+        where,
+      });
+
+      return { products, count };
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to get product', e.message);
