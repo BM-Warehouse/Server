@@ -1,12 +1,16 @@
 const UserController = require('@controllers/user.controller');
-const { authorization } = require('@middlewares/auth');
+const { adminAuthorization } = require('@middlewares/auth');
 const router = require('express').Router();
+
+router.use(adminAuthorization);
 
 router.get('/', UserController.getAllUsers);
 
+router.get('/me', UserController.getLoginUser);
+
 router.get('/:id', UserController.getDetailUser);
 
-router.use(authorization);
+router.use(adminAuthorization);
 
 router.post('/', UserController.createUser);
 

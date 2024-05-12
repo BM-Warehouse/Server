@@ -30,7 +30,13 @@ describe('Cart API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      jwt.verifyToken.mockReturnValueOnce({
+        userId: 1,
+        cartId: 1,
+        username: 'admin',
+        role: 'admin',
+        iat: 1715447961,
+      });
 
       // Mock data cart
       const mockCartData = [{ id: 1, status: 'not checkouted', totalPrice: 0, userId: 1 }];
@@ -55,7 +61,13 @@ describe('Cart API', () => {
       });
 
       // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+      jwt.verifyToken.mockReturnValueOnce({
+        userId: 1,
+        cartId: 1,
+        username: 'admin',
+        role: 'admin',
+        iat: 1715447961,
+      });
 
       // Mock data cart
       const mockCartData = { id: 1, userId: 1, status: 'not checkouted', totalPrice: 0 };

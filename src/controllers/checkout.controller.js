@@ -29,7 +29,7 @@ class CheckoutController {
 
   static async getDetail(req, res, next) {
     try {
-      const id = req.params.id;
+      const id = req.params.checkoutId;
       const checkout = await CheckoutService.getDetail(id);
       res.status(200).json(successResponse(checkout, 'Checkout retrieved successfully'));
     } catch (e) {
@@ -48,7 +48,7 @@ class CheckoutController {
 
   static async update(req, res, next) {
     try {
-      const id = req.params.id;
+      const id = req.params.checkoutId;
       const checkout = await CheckoutService.update(id, req.body);
       res.status(200).json(successResponse(checkout, 'Checkout updated successfully'));
     } catch (e) {
@@ -88,6 +88,20 @@ class CheckoutController {
       res.status(200).json(successResponse(productCheckout, 'set feedback success'));
     } catch (e) {
       next(e);
+    }
+  }
+
+  static async getUserCheckouts(req, res, next) {
+    try {
+      const { userId } = req.loggedUser;
+
+      const checkoutsUser = await CheckoutService.getUserCheckouts(+userId);
+
+      res
+        .status(200)
+        .json(successResponse({ checkoutsUser }, 'Data all user checkouts successfully retrieved'));
+    } catch (err) {
+      next(err);
     }
   }
 }

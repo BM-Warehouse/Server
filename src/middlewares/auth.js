@@ -6,6 +6,7 @@ const {
   ForbiddenError,
   ClientError,
 } = require('@exceptions/error.excecptions');
+const prisma = require('@src/libs/prisma');
 
 class AuthMiddleware {
   static async authentication(req, res, next) {
@@ -28,13 +29,15 @@ class AuthMiddleware {
             'The access token provided is invalid or expired.',
           );
         } else {
-          const result = await AuthService.findUserById(decoded.id);
-
-          req.loggedUser = {
-            id: result.id,
-            username: result.username,
-            role: result.role,
-          };
+          const user = await AuthService.findUserById(decoded.userId);
+          if (user) {
+            req.loggedUser = decoded;
+          } else {
+            throw new UnauthorizedError(
+              'Authorization error',
+              `The user with id ${decoded.userId} is not exist!`,
+            );
+          }
           next();
         }
       } else {
@@ -54,23 +57,91 @@ class AuthMiddleware {
     }
   }
 
-  static async authorization(req, res, next) {
+  static async adminAuthorization(req, res, next) {
     try {
       if (req.loggedUser.role === 'admin') next();
       else {
-        throw new ForbiddenError(
-          'Access denied: User does not have admin privileges',
-          'This operation requires admin privileges.',
+        next(
+          new ForbiddenError(
+            'Access denied: User does not have admin privileges',
+            'This operation requires admin privileges.',
+          ),
         );
       }
     } catch (e) {
       if (!(e instanceof ClientError)) {
-        throw new InternalServerError(
-          'Oops, something went wrong',
-          `An error occurred: ${e.message}`,
+        next(
+          new InternalServerError('Oops, something went wrong', `An error occurred: ${e.message}`),
         );
       } else {
-        throw e;
+        next(e);
+      }
+    }
+  }
+
+  static async userAuthorization(req, res, next) {
+    try {
+      if (req.loggedUser.role === 'admin') next();
+      else if (req.body.userId) {
+        if (req.body.userId === req.loggedUser.userId) next();
+        else
+          next(
+            new ForbiddenError('Access denied', `User with id ${req.body.userId} have no access.`),
+          );
+      } else if (req.body.checkoutId) {
+        const checkout = await prisma.checkout.findUnique({
+          where: {
+            id: req.body.checkoutId,
+          },
+        });
+        if (checkout.userId === req.loggedUser.userId) next();
+        else
+          next(
+            new ForbiddenError(
+              'Access denied',
+              `Checkout with id ${req.body.checkoutId} is not belong to user with id ${req.loggedUser.userId}.`,
+            ),
+          );
+        // } else if (req.body.cartId) {
+        //   if (req.body.cartId === req.loggedUser.cartId) next();
+        //   else {
+        //     next(
+        //       new ForbiddenError(
+        //         'Access denied',
+        //         `User with id ${req.loggedUser.userId} have no access to cart with id ${req.body.cartId}.`,
+        //       ),
+        //     );
+        //   }
+      } else if (req.params.checkoutId) {
+        const checkout = await prisma.checkout.findUnique({
+          where: {
+            id: req.params.checkoutId,
+          },
+        });
+        if (checkout.userId === req.loggedUser.userId) next();
+        else {
+          next(
+            new ForbiddenError(
+              'Access denied',
+              `Checkout with id ${req.body.checkoutId} is not belong to user with id ${req.loggedUser.userId}.`,
+            ),
+          );
+        }
+      } else {
+        next(
+          new ForbiddenError(
+            'Access denied: User does not have admin privileges',
+            'This operation requires admin privileges.',
+          ),
+        );
+      }
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        next(
+          new InternalServerError('Oops, something went wrong', `An error occurred: ${e.message}`),
+        );
+      } else {
+        next(e);
       }
     }
   }

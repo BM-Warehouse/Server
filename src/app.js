@@ -26,6 +26,9 @@ app.get('/', async (req, res, next) => {
 app.use(routes);
 app.use(notFound);
 app.use(errorHandler);
-runExpiredCheckScheduler();
+
+if (process.env.NODE_ENV != 'test') {
+  runExpiredCheckScheduler();
+}
 
 module.exports = app;
