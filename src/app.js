@@ -3,6 +3,7 @@
 require('module-alias/register');
 
 const express = require('express');
+const cors = require('cors');
 const errorHandler = require('@middlewares/errorHandler');
 const notFound = require('@middlewares/notFound');
 const { ClientError } = require('@exceptions/error.excecptions');
@@ -11,6 +12,8 @@ const { runExpiredCheckScheduler } = require('@libs/expiredChecker');
 const routes = require('@routes/index');
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
