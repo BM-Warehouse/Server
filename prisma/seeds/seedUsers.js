@@ -14,6 +14,18 @@ const users = [
     role: 'admin',
   },
   {
+    email: 'user@mail.com',
+    username: 'user',
+    password: '$2a$12$8vY9Io88MYRjFumzdUv.ZexWv3ssWDqMPpjnmtmuq.uNockOjB0la',
+    fullName: 'Mister User',
+    phone: '081234567890',
+    address: 'example user street',
+    gender: 'Male',
+    birthdate: new Date('1971-08-14'),
+    avatar: 'https://robohash.org/quosipsumvoluptatum.png?size=50x50&set=set1',
+    role: 'admin',
+  },
+  {
     email: 'mgiottini1@mail.com',
     username: 'mgiottini1',
     password: '$2y$10$k9vKNFWCsyN7pC8psqA4Ney.mIBC8IjakN4vcbPrgXO29JOlZDOV2',
