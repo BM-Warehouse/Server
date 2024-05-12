@@ -19,9 +19,15 @@ class ProductService {
   }
 
   static async getAll(payload) {
-    const { page, limit, categoryId, warehouseId, minPrice, maxPrice } = payload;
+    const { page, limit, categoryId, warehouseId, minPrice, maxPrice, contains } = payload;
     let where = { price: {} };
 
+    if (contains) {
+      where.name = {
+        contains,
+        mode: 'insensitive',
+      };
+    }
     if (categoryId) {
       where.productCategories = {
         some: {
@@ -78,7 +84,11 @@ class ProductService {
         take: limit,
       });
 
-      return products;
+      const count = await prisma.product.count({
+        where,
+      });
+
+      return { products, count };
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to get product', e.message);

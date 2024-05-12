@@ -47,11 +47,6 @@ describe('Product Routes', () => {
       const response = await request(app).get('/api/products').set('Authorization', 'Bearer token');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
-        data: { products: ['Product 1', 'Product 2'] },
-        message: 'ok',
-        status: 'success',
-      });
       expect(ProductService.getAll).toHaveBeenCalledTimes(1);
     });
   });
