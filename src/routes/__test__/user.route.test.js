@@ -19,8 +19,17 @@ jwt.verifyToken = jest.fn();
 bcrypt.hashPassword = jest.fn();
 
 describe('User API', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
+
+    // Mock token verification
+    jwt.verifyToken.mockReturnValueOnce({
+      userId: 1,
+      cartId: 1,
+      username: 'admin',
+      role: 'admin',
+      iat: 1715447961,
+    });
   });
 
   describe('GET /api/users', () => {
@@ -37,9 +46,6 @@ describe('User API', () => {
         { id: 1, username: 'user1' },
         { id: 2, username: 'user2' },
       ]);
-
-      // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Send request with bearer token
       const response = await request(app)
@@ -68,9 +74,6 @@ describe('User API', () => {
       // Mock the return value of getDetailUser method
       UserService.getDetailUser.mockResolvedValueOnce({ id: 1, username: 'user1' });
 
-      // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
-
       // Send request with bearer token
       const response = await request(app)
         .get('/api/users/1')
@@ -92,9 +95,6 @@ describe('User API', () => {
         username: 'admin',
         role: 'admin',
       });
-
-      // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Mock the implementation of createUser method
       UserService.createUser.mockImplementation(
@@ -190,9 +190,6 @@ describe('User API', () => {
         role: 'user',
       });
 
-      // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
-
       // Send request with bearer token and updated user data
       const response = await request(app)
         .put('/api/users/1')
@@ -225,6 +222,19 @@ describe('User API', () => {
 });
 
 describe('DELETE /api/users/:id', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Mock token verification
+    jwt.verifyToken.mockReturnValueOnce({
+      userId: 1,
+      cartId: 1,
+      username: 'admin',
+      role: 'admin',
+      iat: 1715447961,
+    });
+  });
+
   it('should delete a user', async () => {
     // Mock the authentication middleware
     AuthService.findUserById.mockResolvedValueOnce({
@@ -235,9 +245,6 @@ describe('DELETE /api/users/:id', () => {
 
     // Mock the return value of destroyUser method
     UserService.destroyUser.mockResolvedValueOnce();
-
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
     // Send request with bearer token
     const response = await request(app)

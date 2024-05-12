@@ -19,8 +19,17 @@ jwt.verifyToken = jest.fn();
 bcrypt.hashPassword = jest.fn();
 
 describe('Product Routes', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks(); // Clear mock calls after each test
+
+    // Mock token verification
+    jwt.verifyToken.mockReturnValueOnce({
+      userId: 1,
+      cartId: 1,
+      username: 'admin',
+      role: 'admin',
+      iat: 1715447961,
+    });
   });
 
   describe('GET /api/products', () => {
@@ -31,9 +40,6 @@ describe('Product Routes', () => {
         username: 'admin',
         role: 'admin',
       });
-
-      // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Mock the ProductService.getAll function
       ProductService.getAll.mockResolvedValue(['Product 1', 'Product 2']);
@@ -58,9 +64,6 @@ describe('Product Routes', () => {
         username: 'admin',
         role: 'admin',
       });
-
-      // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       // Mock the ProductService.getDetail function
       const productId = 1;
@@ -88,9 +91,6 @@ describe('Product Routes', () => {
         username: 'admin',
         role: 'admin',
       });
-
-      // Mock token verification
-      jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
       const productData = { name: 'New Product', price: 10 };
 

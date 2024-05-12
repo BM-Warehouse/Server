@@ -12,11 +12,17 @@
     "es2021": true,
   },
   "rules": {
-    "no-console": "warn",
-    "max-len": ["error", 200],
+    "no-console":"warn",
+    "max-len": [
+      "error",
+      200
+    ],
     "import/no-named-default": "off",
     "import/prefer-default-export": "off",
-    "quotes": ["error", "single"],
-    "semi": "error",
-  },
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "semi": "error"
+  }
 }
