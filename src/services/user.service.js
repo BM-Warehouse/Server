@@ -7,21 +7,71 @@ const {
 } = require('@exceptions/error.excecptions');
 
 class UserService {
-  static async getAllUsers({ page, limit }) {
+  static async getAllUsers({ page, limit, orderType, orderBy, contains }) {
+    let where = {};
+    let orderInfo;
+    const ORDER_TYPE_DEFAULT = 'asc';
+
+    if (contains) {
+      where.email = {
+        contains,
+        mode: 'insensitive',
+      };
+    }
+    if (orderBy === 'id') {
+      orderInfo = {
+        id: orderType || ORDER_TYPE_DEFAULT,
+      };
+    } else if (orderBy === 'email') {
+      orderInfo = {
+        email: orderType || ORDER_TYPE_DEFAULT,
+      };
+    } else if (orderBy === 'username') {
+      orderInfo = {
+        username: orderType || ORDER_TYPE_DEFAULT,
+      };
+    } else if (orderBy === 'fullName') {
+      orderInfo = {
+        fullName: orderType || ORDER_TYPE_DEFAULT,
+      };
+    }
+
     try {
       const users = await prisma.user.findMany({
+        where,
         skip: (page - 1) * limit,
         take: limit,
+        orderBy: orderInfo,
       });
 
       if (!users || users.length === 0) {
         throw new NotFoundError(
           'Users not found',
-          'No users found for the specified page and limit',
+          'No users found for the specified page, limit, and criteria',
         );
       }
 
       return users;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async getAllCount() {
+    try {
+      const userCount = await prisma.user.count();
+
+      if (!userCount) {
+        throw new NotFoundError('User not found', 'No users were found in the database');
+      }
+      return userCount;
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError(

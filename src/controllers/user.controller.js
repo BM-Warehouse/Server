@@ -2,6 +2,7 @@ const { hashPassword } = require('@libs/bcrypt.js');
 const UserService = require('@services/user.service');
 const { BadRequest } = require('@exceptions/error.excecptions');
 const { successResponse } = require('@src/responses/responses');
+const { getPaginationStatus } = require('@src/libs/pagination');
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -18,12 +19,21 @@ class UserController {
       page = +page || DEFAULT_PAGE;
       limit = +limit || DEFAULT_LIMIT;
 
-      const users = await UserService.getAllUsers({
+      req.query = {
+        ...req.query,
         page,
         limit,
-      });
+      };
 
-      res.status(200).json({ users });
+      const users = await UserService.getAllUsers(req.query);
+      const totalCount = await UserService.getAllCount();
+      const pagination = getPaginationStatus(page, limit, totalCount);
+
+      if (!pagination) {
+        throw new BadRequest('Pagination Error', 'Failed to retrieve pagination status');
+      }
+
+      res.status(200).json({ message: 'Get all Users success', users, pagination });
     } catch (e) {
       next(e);
     }
