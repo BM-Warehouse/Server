@@ -52,12 +52,13 @@ class AuthController {
       const { username, password } = req.body;
 
       const foundUser = await AuthService.findUserByUsername(username);
-      const foundCart = await AuthService.findCartbyUserId(foundUser.id);
+
+      // const foundCart = await AuthService.findCartbyUserId(foundUser.id);
 
       if (bcrypt.comparePassword(password, foundUser.password)) {
         const accessToken = jwt.generateToken({
           userId: foundUser.id,
-          cartId: foundCart.id,
+          // cartId: foundCart.id,
           username: foundUser.username,
           role: foundUser.role,
         });

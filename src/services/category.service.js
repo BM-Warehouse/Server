@@ -34,6 +34,12 @@ class CategoryService {
         take: limit,
         orderBy: orderInfo,
       });
+      if (!categories[0]) {
+        throw new NotFoundError(
+          'Categories not found',
+          `Categories contained '${contains}' are not available`,
+        );
+      }
       return categories;
     } catch (e) {
       if (!(e instanceof ClientError)) {
