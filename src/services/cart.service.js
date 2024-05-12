@@ -166,7 +166,7 @@ class CartService {
         },
       });
     } catch (err) {
-      // console.log(err);
+      // console.log(err);;
       if (!(err instanceof ClientError)) {
         throw new InternalServerError(
           'Oops, something went wrong',
