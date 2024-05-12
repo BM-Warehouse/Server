@@ -19,9 +19,15 @@ class ProductService {
   }
 
   static async getAll(payload) {
-    const { page, limit, categoryId, warehouseId, minPrice, maxPrice } = payload;
+    const { page, limit, categoryId, warehouseId, minPrice, maxPrice, contains } = payload;
     let where = { price: {} };
 
+    if (contains) {
+      where.name = {
+        contains,
+        mode: 'insensitive',
+      };
+    }
     if (categoryId) {
       where.productCategories = {
         some: {
