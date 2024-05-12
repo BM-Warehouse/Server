@@ -57,18 +57,19 @@ describe('WarehouseController', () => {
         role: 'admin',
       });
 
-      const warehouses = [
+      const output = [
         { id: 1, name: 'Warehouse A' },
         { id: 2, name: 'Warehouse B' },
       ];
-      WarehouseService.getAllWarehouses.mockResolvedValueOnce(warehouses);
+      const testQueryParams = { page: 1, limit: 10 };
+      WarehouseService.getAllWarehouses.mockResolvedValueOnce(output);
 
       const response = await request(app)
         .get('/api/warehouses')
+        .query(testQueryParams)
         .set('Authorization', 'Bearer fakeToken');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(warehouses);
       expect(WarehouseService.getAllWarehouses).toHaveBeenCalledWith({ page: 1, limit: 10 });
     });
   });

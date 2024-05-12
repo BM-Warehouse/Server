@@ -13,8 +13,7 @@ class CategoryController {
       payload.limit = +payload.limit || DEFAULT_LIMIT;
 
       const categories = await CategoryService.getAllCategories(payload);
-      const totalCount = await CategoryService.getAllCount();
-      const pagination = getPaginationStatus(payload.page, payload.limit, totalCount);
+      const pagination = getPaginationStatus(payload.page, payload.limit, categories.count);
       res
         .status(200)
         .json({ message: 'Get all categories success', categories: categories, pagination });

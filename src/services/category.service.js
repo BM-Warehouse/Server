@@ -40,7 +40,10 @@ class CategoryService {
           `Categories contained '${contains}' are not available`,
         );
       }
-      return categories;
+      const count = await prisma.category.count({
+        where,
+      });
+      return { categories, count };
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to get all categories from db', e.message);
@@ -48,11 +51,6 @@ class CategoryService {
         throw e;
       }
     }
-  }
-
-  static async getAllCount() {
-    const categoriesCount = await prisma.category.count();
-    return categoriesCount;
   }
 
   static async addCategory({ name, description, imageUrl }) {
