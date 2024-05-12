@@ -81,7 +81,9 @@ class CheckoutService {
         take: limit,
       });
 
-      return checkouts;
+      const count = await prisma.checkout.count();
+
+      return { checkouts, count };
     } catch (error) {
       if (!(error instanceof ClientError)) {
         throw new InternalServerError('Fail to process products', error);
