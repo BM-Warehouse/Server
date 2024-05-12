@@ -8,7 +8,7 @@ const warehouseRoute = require('@routes/warehouse.route');
 const cartRoute = require('@routes/cart.route');
 const { authentication } = require('@middlewares/auth');
 
-/**** Koleksi Route disini *******/
+/****** Koleksi Route disini *******/
 router.use('/api', authRoute);
 router.use(authentication);
 router.use('/api/products', productRoute);
