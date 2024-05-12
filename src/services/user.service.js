@@ -196,6 +196,31 @@ class UserService {
       }
     }
   }
+
+  static async getLoginUser(userId) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        throw new NotFoundError('User not found', `No user was found with the ID: ${userId}`);
+      }
+
+      return user;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError(
+          'Oops, something went wrong',
+          `An error occurred: ${e.message}`,
+        );
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = UserService;

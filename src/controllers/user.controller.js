@@ -1,6 +1,7 @@
 const { hashPassword } = require('@libs/bcrypt.js');
 const UserService = require('@services/user.service');
 const { BadRequest } = require('@exceptions/error.excecptions');
+const { successResponse } = require('@src/responses/responses');
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -123,6 +124,18 @@ class UserController {
 
       await UserService.destroyUser(id);
       res.status(200).json({ message: 'User deleted successfully' });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async getLoginUser(req, res, next) {
+    try {
+      const { id } = req.loggedUser;
+
+      const me = await UserService.getLoginUser(+id);
+
+      res.status(200).json(successResponse({ me }, 'Cart successfully retrieved'));
     } catch (e) {
       next(e);
     }
