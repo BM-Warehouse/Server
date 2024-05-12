@@ -25,9 +25,8 @@ class CategoryController {
 
   static async addCategory(req, res, next) {
     try {
-      const { name } = req.body;
-      await CategoryService.addCategory(name);
-      res.status(201).json({ message: 'category added successfully' });
+      const newCategory = await CategoryService.addCategory(req.body);
+      res.status(201).json(successResponse({ newCategory }, 'category added successfully'));
     } catch (e) {
       next(e);
     }
@@ -37,8 +36,8 @@ class CategoryController {
     try {
       const { id } = req.params;
       const { name, description, imageUrl } = req.body;
-      await CategoryService.editCategory(id, name, description, imageUrl);
-      res.status(200).json({ message: 'category edited successfully' });
+      const editedCategory = await CategoryService.editCategory(id, name, description, imageUrl);
+      res.status(200).json(successResponse({ editedCategory }, 'category edited successfully'));
     } catch (e) {
       next(e);
     }
@@ -47,8 +46,8 @@ class CategoryController {
   static async removeCategory(req, res, next) {
     try {
       const { id } = req.params;
-      await CategoryService.removeCategory(id);
-      res.status(200).json({ message: 'Category deleted successfully' });
+      const removed = await CategoryService.removeCategory(id);
+      res.status(200).json(successResponse({ removed }, 'Category deleted successfully'));
     } catch (e) {
       next(e);
     }
@@ -77,9 +76,10 @@ class CategoryController {
 
   static async removeProductCategory(req, res, next) {
     try {
-      const { productId, categoryId } = req.body;
-      const removed = await CategoryService.removeProductCategory(productId, categoryId);
-      res.json(successResponse({ removed }, 'remove product-category relation success'));
+      const removed = await CategoryService.removeProductCategory(req.body);
+      res
+        .status(200)
+        .json(successResponse({ removed }, 'remove product-category relation success'));
     } catch (e) {
       next(e);
     }
