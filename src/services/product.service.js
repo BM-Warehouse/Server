@@ -106,7 +106,16 @@ class ProductService {
         },
         include: {
           productWarehouses: true,
-          productCategories: true,
+          productCategories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
       });
 
