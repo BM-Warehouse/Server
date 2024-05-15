@@ -19,11 +19,6 @@ app.use(cors());
 
 app.use(express.json());
 
-const options = {
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.cert'),
-};
-
 // ping server
 app.get('/', async (req, res, next) => {
   try {
@@ -39,10 +34,14 @@ app.use(errorHandler);
 
 if (process.env.NODE_ENV != 'test') {
   runExpiredCheckScheduler();
-}
+  const options = {
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.cert'),
+  };
 
-https.createServer(options, app).listen(443, () => {
-  console.log('Server started on port 443');
-});
+  https.createServer(options, app).listen(443, () => {
+    console.log('Server started on port 443');
+  });
+}
 
 module.exports = app;
