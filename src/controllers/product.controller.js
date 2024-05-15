@@ -30,7 +30,7 @@ class ProductController {
     try {
       const id = req.params.id;
       const product = await ProductService.getDetail(id);
-      res.status(200).json(successResponse(product, 'Products retrieved successfully'));
+      res.status(200).json(successResponse({ product }, 'Products retrieved successfully'));
     } catch (e) {
       next(e);
     }
@@ -39,7 +39,7 @@ class ProductController {
   static async add(req, res, next) {
     try {
       const product = await ProductService.add(req.body);
-      res.status(200).json(successResponse(product, 'Products added successfully'));
+      res.status(200).json(successResponse({ product }, 'Products added successfully'));
     } catch (e) {
       next(e);
     }
@@ -48,7 +48,7 @@ class ProductController {
   static async edit(req, res, next) {
     try {
       const product = await ProductService.edit(req.body);
-      res.status(200).json(successResponse(product, 'Products edited successfully!'));
+      res.status(200).json(successResponse({ product }, 'Products edited successfully!'));
     } catch (e) {
       next(e);
     }
@@ -57,7 +57,7 @@ class ProductController {
   static async delete(req, res, next) {
     try {
       const product = await ProductService.delete(req.params.id);
-      res.status(200).json(successResponse(product, 'Products deleted successfully!'));
+      res.status(200).json(successResponse({ product }, 'Products deleted successfully!'));
     } catch (e) {
       next(e);
     }
@@ -66,7 +66,9 @@ class ProductController {
   static async addToWarehouse(req, res, next) {
     try {
       const product = await ProductService.addToWarehouse(req.body);
-      res.status(200).json(successResponse(product, 'Product added to warehouse successfully!'));
+      res
+        .status(200)
+        .json(successResponse({ product }, 'Product added to warehouse successfully!'));
     } catch (e) {
       next(e);
     }
@@ -77,7 +79,7 @@ class ProductController {
       const product = await ProductService.moveWarehouse(req.body);
       res
         .status(200)
-        .json(successResponse(product, 'Product(s) has/have been moved successfully!'));
+        .json(successResponse({ product }, 'Product(s) has/have been moved successfully!'));
     } catch (e) {
       next(e);
     }
@@ -102,7 +104,7 @@ class ProductController {
 
       const batches = await ProductService.getExpired(filter);
 
-      res.status(200).json(successResponse(batches, 'Successfully retieve data from batch'));
+      res.status(200).json(successResponse({ batches }, 'Successfully retieve data from batch'));
     } catch (e) {
       next(e);
     }
@@ -131,7 +133,7 @@ class ProductController {
       };
 
       const batches = await ProductService.damage(payload);
-      res.status(200).json(successResponse(batches, 'Successfully retieve data from batch'));
+      res.status(200).json(successResponse({ batches }, 'Successfully retieve data from batch'));
     } catch (e) {
       next(e);
     }
