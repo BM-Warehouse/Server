@@ -21,8 +21,9 @@ app.use(express.json());
 // Trust the first proxy
 app.set('trust proxy', 1);
 
-// Force SSL middleware
-app.use(forceSSL);
+if (process.env.NODE_ENV !== 'test') {
+  app.use(forceSSL);
+}
 
 // ping server
 app.get('/', async (req, res, next) => {
