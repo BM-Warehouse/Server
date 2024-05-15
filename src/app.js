@@ -8,6 +8,7 @@ const errorHandler = require('@middlewares/errorHandler');
 const notFound = require('@middlewares/notFound');
 const { ClientError } = require('@exceptions/error.excecptions');
 const { runExpiredCheckScheduler } = require('@libs/expiredChecker');
+const forceSSL = require('express-force-https');
 
 const routes = require('@routes/index');
 
@@ -16,6 +17,12 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+
+// Trust the first proxy
+app.set('trust proxy', 1);
+
+// Force SSL middleware
+app.use(forceSSL);
 
 // ping server
 app.get('/', async (req, res, next) => {
