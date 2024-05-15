@@ -92,7 +92,7 @@ class UserController {
         role,
       );
       // res.status(201).json({ data: user, message: 'User added successfully' });
-      res.status(200).json(successResponse({ user }, 'User added successfully'));
+      res.status(201).json(successResponse({ user }, 'User added successfully'));
     } catch (e) {
       next(e);
     }
