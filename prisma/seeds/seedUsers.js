@@ -10,7 +10,7 @@ const users = [
     address: 'example admin street',
     gender: 'Male',
     birthdate: new Date('1971-08-14'),
-    avatar: 'https://robohash.org/quosipsumvoluptatum.png?size=50x50&set=set1',
+    avatar: 'https://res.cloudinary.com/denyah3ls/image/upload/v1715770859/yn61qsvi38nnr5hj0t16.jpg',
     role: 'admin',
   },
   {
@@ -22,8 +22,8 @@ const users = [
     address: 'example user street',
     gender: 'Male',
     birthdate: new Date('1971-08-14'),
-    avatar: 'https://robohash.org/quosipsumvoluptatum.png?size=50x50&set=set1',
-    role: 'admin',
+    avatar: 'https://res.cloudinary.com/denyah3ls/image/upload/v1715770859/fk6mep0afnecdthbinp0.jpg',
+    role: 'user',
   },
   {
     email: 'mgiottini1@mail.com',
