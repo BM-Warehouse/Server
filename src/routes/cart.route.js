@@ -1,8 +1,8 @@
 const CartController = require('@src/controllers/cart.controller');
-const { userAuthorization } = require('@src/middlewares/auth');
+// const { userAuthorization } = require('@src/middlewares/auth');
 const router = require('express').Router();
 
-router.use(userAuthorization);
+// router.use(userAuthorization);
 
 router.get('/all', CartController.getAllCarts);
 

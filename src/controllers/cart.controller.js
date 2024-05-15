@@ -60,7 +60,7 @@ class CartController {
 
       const item = await CartService.deleteCartProduct(payload);
 
-      res.status(200).json(successResponse(item, 'Product item deleted successfully'));
+      res.status(200).json(successResponse({ item }, 'Product item deleted successfully'));
     } catch (e) {
       next(e);
     }
