@@ -53,6 +53,23 @@ class CategoryService {
     }
   }
 
+  static async getCategoryDetail({ id }) {
+    try {
+      const category = await prisma.category.findUnique({
+        where: {
+          id: +id,
+        },
+      });
+      return category;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to get category from db', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
   static async addCategory({ name, description, imageUrl }) {
     try {
       if (!name || !description || !imageUrl) {

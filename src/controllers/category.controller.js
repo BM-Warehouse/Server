@@ -16,7 +16,16 @@ class CategoryController {
       const pagination = getPaginationStatus(payload.page, payload.limit, categories.count);
       res
         .status(200)
-        .json({ message: 'Get all categories success', categories: categories, pagination });
+        .json(successResponse({ getAll: categories, pagination }, 'get all category successfully'));
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async getCategoryDetail(req, res, next) {
+    try {
+      const category = await CategoryService.getCategoryDetail(req.params);
+      res.status(200).json(successResponse(category, 'get category detail successfully'));
     } catch (e) {
       next(e);
     }
@@ -57,7 +66,7 @@ class CategoryController {
       const { id } = req.params;
       const categoryId = +id;
       const category = await CategoryService.getProductByCategory(categoryId);
-      res.status(200).json({ message: 'OK', category });
+      res.status(200).json(successResponse(category, 'OK'));
     } catch (e) {
       next(e);
     }
