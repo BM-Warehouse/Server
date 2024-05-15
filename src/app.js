@@ -8,7 +8,8 @@ const errorHandler = require('@middlewares/errorHandler');
 const notFound = require('@middlewares/notFound');
 const { ClientError } = require('@exceptions/error.excecptions');
 const { runExpiredCheckScheduler } = require('@libs/expiredChecker');
-const forceSSL = require('express-force-https');
+const https = require('https');
+const fs = require('fs');
 
 const routes = require('@routes/index');
 
@@ -18,12 +19,10 @@ app.use(cors());
 
 app.use(express.json());
 
-// Trust the first proxy
-app.set('trust proxy', 1);
-
-if (process.env.NODE_ENV !== 'test') {
-  app.use(forceSSL);
-}
+const options = {
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.cert'),
+};
 
 // ping server
 app.get('/', async (req, res, next) => {
@@ -41,5 +40,9 @@ app.use(errorHandler);
 if (process.env.NODE_ENV != 'test') {
   runExpiredCheckScheduler();
 }
+
+https.createServer(options, app).listen(443, () => {
+  console.log('Server started on port 443');
+});
 
 module.exports = app;
