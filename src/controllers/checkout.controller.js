@@ -23,7 +23,10 @@ class CheckoutController {
         limit,
       });
       const pagination = getPaginationStatus(page, limit, checkouts.count);
-      res.status(200).json({ message: 'ok', checkouts, pagination });
+      // res.status(200).json({ message: 'ok', checkouts, pagination });
+      res
+        .status(200)
+        .json(successResponse({ checkouts, pagination }, 'All Checkouts data retrieved'));
     } catch (e) {
       next(e);
     }
