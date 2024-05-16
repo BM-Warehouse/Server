@@ -79,6 +79,9 @@ class CheckoutService {
       const checkouts = await prisma.checkout.findMany({
         skip: (page - 1) * limit,
         take: limit,
+        include: {
+          user: true,
+        },
       });
 
       const count = await prisma.checkout.count();
@@ -98,6 +101,17 @@ class CheckoutService {
       const checkouts = await prisma.checkout.findFirst({
         where: {
           id: +id,
+        },
+        include: {
+          productCheckout: {
+            include: {
+              product: true,
+              warehouse: true,
+            },
+            orderBy: {
+              productId: 'asc',
+            },
+          },
         },
       });
 
@@ -365,6 +379,7 @@ class CheckoutService {
         }
       }); // end transaction
     } catch (e) {
+      console.log(e);
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Failed to send checkout', e.message);
       } else {
