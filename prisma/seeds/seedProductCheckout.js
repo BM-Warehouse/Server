@@ -9,11 +9,11 @@ async function generateProductCheckouts() {
 
     for (const checkout of checkouts) {
         shuffleArray(products);
-        const numberOfSelectedProducts = Math.floor(Math.random() * 5) + 1;
+        const numberOfSelectedProducts = Math.floor(Math.random() *20) + 1;
         const selectedProduct = products.slice(0, numberOfSelectedProducts);
 
         for (const product of selectedProduct) {
-            const quantityItem = Math.floor(Math.random() * 10 + 1);
+            const quantityItem = Math.floor(Math.random() * 20 + 1);
             const productPrice = quantityItem * product.price;
             productCheckouts.push({
                 productId: product.id,
