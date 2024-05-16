@@ -61,6 +61,33 @@ describe('Category API', () => {
     });
   });
 
+  //Test to get category detail
+  describe('GET /api/categories/:id', () => {
+    it('should get category detail', async () => {
+      // Mock the authentication middleware
+      AuthService.findUserById.mockResolvedValueOnce({
+        id: 1,
+        username: 'admin',
+        role: 'admin',
+      });
+
+      const categoryId = 1;
+      CategoryService.getCategoryDetail.mockResolvedValue({ id: categoryId, name: 'Category 1' });
+
+      const response = await request(app)
+        .get(`/api/categories/${categoryId}`)
+        .set('Authorization', 'Bearer token');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        data: { id: 1, name: 'Category 1' },
+        message: 'get category detail successfully',
+        status: 'success',
+      });
+      expect(CategoryService.getCategoryDetail).toHaveBeenCalledWith({ id: '1' });
+    });
+  });
+
   // Test to add a new category
   describe('POST /api/categories', () => {
     it('should add a new category', async () => {
@@ -212,49 +239,49 @@ describe('Category API', () => {
   });
 
   // Test to get products by category
-  describe('GET /api/categories/:id', () => {
-    it('should return products by category', async () => {
-      // Mock the authentication middleware
-      AuthService.findUserById.mockResolvedValueOnce({
-        id: 1,
-        username: 'admin',
-        role: 'admin',
-      });
+  // describe('GET /api/categories/:id', () => {
+  //   it('should return products by category', async () => {
+  //     // Mock the authentication middleware
+  //     AuthService.findUserById.mockResolvedValueOnce({
+  //       id: 1,
+  //       username: 'admin',
+  //       role: 'admin',
+  //     });
 
-      // Mock token verification
-      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+  //     // Mock token verification
+  //     // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
-      // Mock the getProductByCategory method to resolve
-      const mockedProducts = Array.from({ length: 5 }, generateRandomData);
-      CategoryService.getProductByCategory.mockResolvedValue(mockedProducts);
+  //     // Mock the getProductByCategory method to resolve
+  //     const mockedProducts = Array.from({ length: 5 }, generateRandomData);
+  //     CategoryService.getProductByCategory.mockResolvedValue(mockedProducts);
 
-      const response = await request(app)
-        .get('/api/categories/123')
-        .set('Authorization', 'Bearer token');
+  //     const response = await request(app)
+  //       .get('/api/categories/123')
+  //       .set('Authorization', 'Bearer token');
 
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('message', 'OK');
-    });
+  //     expect(response.status).toBe(200);
+  //     expect(response.body).toHaveProperty('message', 'OK');
+  //   });
 
-    it('should return 404 if category not found', async () => {
-      // Mock the authentication middleware
-      AuthService.findUserById.mockResolvedValueOnce({
-        id: 1,
-        username: 'admin',
-        role: 'admin',
-      });
+  //   it('should return 404 if category not found', async () => {
+  //     // Mock the authentication middleware
+  //     AuthService.findUserById.mockResolvedValueOnce({
+  //       id: 1,
+  //       username: 'admin',
+  //       role: 'admin',
+  //     });
 
-      // Mock token verification
-      // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
+  //     // Mock token verification
+  //     // jwt.verifyToken.mockReturnValueOnce({ id: 1 });
 
-      // Mock the getProductByCategory method to throw an error
-      CategoryService.getProductByCategory.mockRejectedValue(new Error('Category not found'));
+  //     // Mock the getProductByCategory method to throw an error
+  //     CategoryService.getProductByCategory.mockRejectedValue(new Error('Category not found'));
 
-      const response = await request(app)
-        .get('/api/categories/products')
-        .set('Authorization', 'Bearer token');
+  //     const response = await request(app)
+  //       .get('/api/categories/products')
+  //       .set('Authorization', 'Bearer token');
 
-      expect(response.status).toBe(404);
-    });
-  });
+  //     expect(response.status).toBe(404);
+  //   });
+  // });
 });

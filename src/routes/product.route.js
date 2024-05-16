@@ -3,7 +3,7 @@ const { adminAuthorization } = require('@src/middlewares/auth');
 const router = require('express').Router();
 
 router.get('/', ProductController.getAll);
-router.get('/detail/:id', ProductController.getDetail);
+router.get('/:id', ProductController.getDetail);
 
 router.use(adminAuthorization);
 router.post('/', ProductController.add);
