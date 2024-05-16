@@ -54,6 +54,9 @@ model Checkout {
   totalPrice Int?
   status     String?  @default("sedang dikemas")
   resi       String?
+  method     String?
+  address    String?
+  courier    String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
