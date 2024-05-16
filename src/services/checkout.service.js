@@ -79,6 +79,9 @@ class CheckoutService {
       const checkouts = await prisma.checkout.findMany({
         skip: (page - 1) * limit,
         take: limit,
+        include: {
+          user: true,
+        },
       });
 
       const count = await prisma.checkout.count();
@@ -93,22 +96,42 @@ class CheckoutService {
     }
   }
 
-  static async getDetail(id) {
+  static async getDetail(id, filter) {
+    const { limit, page } = filter;
+
     try {
-      const checkouts = await prisma.checkout.findFirst({
+      const checkout = await prisma.checkout.findFirst({
         where: {
           id: +id,
         },
+        include: {
+          productCheckout: {
+            include: {
+              product: true,
+              warehouse: true,
+            },
+            orderBy: {
+              productId: 'asc',
+            },
+            skip: (page - 1) * limit,
+            take: limit,
+          },
+        },
       });
 
-      if (!checkouts) {
+      if (!checkout) {
         throw new NotFoundError(
           'No Product process',
           `There is no product will process with id ${id}`,
         );
       }
 
-      return checkouts;
+      const count = await prisma.productCheckout.count({
+        where: {
+          checkoutId: +id,
+        },
+      });
+      return { checkout, count };
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('failed to get details of the product being processed', e);
