@@ -1,4 +1,4 @@
-// seed ini harus dijalankan setelah seed produk dan batch selesai dilakukan
+// seed ini harus dijalankan setelah seed warehouse, produk dan batch selesai dilakukan
 const prisma = require('@libs/prisma');
 
 const productWarehouses = [];
@@ -35,14 +35,6 @@ async function generateProductWarehouses() {
         }
     }
     return productWarehouses;
-}
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
 }
 
 async function seedProductCarts() {
