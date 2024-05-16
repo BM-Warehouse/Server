@@ -192,15 +192,18 @@ class CartService {
           `There is no cart associated with user id ${payload.userId}`,
         );
       }
+      // console.log(cart);
 
       const productCart = await prisma.productCart.findUnique({
         where: {
           productId_cartId: {
-            cartId: +payload.userId,
+            cartId: cart.id,
             productId: +payload.productCartId,
           },
         },
       });
+
+      // console.log(productCart);
 
       if (!productCart) {
         throw new NotFoundError(
@@ -214,7 +217,7 @@ class CartService {
       const productCartDeleted = await prisma.productCart.delete({
         where: {
           productId_cartId: {
-            cartId: +payload.userId,
+            cartId: cart.id,
             productId: +payload.productCartId,
           },
         },
