@@ -248,7 +248,7 @@ class CheckoutService {
     }
   }
 
-  static async action({ cartId }) {
+  static async action({ cartId, courier, address, method }) {
     try {
       const cart = await prisma.cart.findUnique({
         where: {
@@ -271,12 +271,18 @@ class CheckoutService {
             status: checkoutStatus.PACKING,
             totalPrice: cart.totalPrice,
             userId: cart.userId,
+            address,
+            courier,
+            method,
           },
         });
 
         // ---- ambil data dari product cart
-        const productCart = await tx.productCart.findMany({});
-
+        const productCart = await tx.productCart.findMany({
+          where: {
+            cartId,
+          },
+        });
         // --- tulis data ke productCheckout
         let data = [];
         productCart.forEach((item) => {

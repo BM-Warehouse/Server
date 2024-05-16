@@ -5,7 +5,7 @@ const carts = [];
 for (let i = 1; i <= 10; i++) {
     carts.push({
         userId: i,
-        totalPrice: 0,
+        totalPrice: 123456,
     });
 }
 
