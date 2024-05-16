@@ -34,9 +34,22 @@ class CheckoutController {
 
   static async getDetail(req, res, next) {
     try {
+      let filter = req.query;
+
+      if ((filter.page && isNaN(filter.page)) || (filter.limit && isNaN(filter.limit))) {
+        throw new BadRequest('Query parameter error', 'limit and page have to be a number');
+      }
+
+      filter.page = +filter.page || DEFAULT_PAGE;
+      filter.limit = +filter.limit || DEFAULT_LIMIT;
+
       const id = req.params.checkoutId;
-      const checkout = await CheckoutService.getDetail(id);
-      res.status(200).json(successResponse(checkout, 'Checkout retrieved successfully'));
+      const { checkout, count } = await CheckoutService.getDetail(id, filter);
+      const pagination = getPaginationStatus(filter.page, filter.limit, count);
+
+      res
+        .status(200)
+        .json(successResponse({ checkout, pagination }, 'Checkout retrieved successfully'));
     } catch (e) {
       next(e);
     }
