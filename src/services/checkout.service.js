@@ -438,6 +438,71 @@ class CheckoutService {
       }
     }
   }
+
+  static async addProduct(id, payload) {
+    try {
+      const checkout = await prisma.checkout.findUnique({
+        where: {
+          id: +id,
+        },
+      });
+
+      if (!checkout)
+        throw new NotFoundError('No Checkout Found', `Can't find Checkout with id ${id}`);
+
+      const product = await prisma.product.findUnique({
+        where: {
+          id: +payload.productId,
+        },
+      });
+
+      const productCheckout = await prisma.$transaction(async (tx) => {
+        const productCheckout = await tx.productCheckout.upsert({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
+          },
+          update: {
+            quantityItem: {
+              increment: +payload.quantity,
+            },
+            productPrice: {
+              increment: +payload.quantity * product.price,
+            },
+          },
+          create: {
+            productId: +payload.productId,
+            checkoutId: +payload.checkoutId,
+            quantityItem: +payload.quantity,
+            productPrice: +payload.quantity * product.price,
+          },
+        });
+
+        await tx.checkout.update({
+          where: {
+            id: +id,
+          },
+          data: {
+            totalPrice: {
+              increment: +payload.quantity * product.price,
+            },
+          },
+        });
+
+        return productCheckout;
+      });
+
+      return productCheckout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to add product to checkout', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = CheckoutService;
