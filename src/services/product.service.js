@@ -71,6 +71,7 @@ class ProductService {
           },
           productWarehouses: {
             select: {
+              quantity: true,
               warehouse: {
                 select: {
                   id: true,
