@@ -80,6 +80,14 @@ class WarehouseController {
       next(e);
     }
   }
-}
 
+  static async getAllWarehouseQuantities(req, res, next) {
+    try {
+      const warehouse = await WarehouseService.productsWarehouse();
+      res.status(200).json(warehouse);
+    } catch (e) {
+      next(e);
+    }
+  }
+}
 module.exports = WarehouseController;
