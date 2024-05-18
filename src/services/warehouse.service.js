@@ -73,6 +73,24 @@ class WarehouseService {
       throw new e();
     }
   }
+
+  static async productsWarehouse() {
+    try {
+      const quantityWarehouse = await prisma.productWarehouse.groupBy({
+        by: ['warehouseId'],
+        _sum: {
+          quantity: true,
+        },
+      });
+
+      return quantityWarehouse.map((warehouse) => ({
+        warehouseId: warehouse.warehouseId,
+        totalQuantity: warehouse._sum.quantity,
+      }));
+    } catch (e) {
+      throw new e();
+    }
+  }
 }
 
 module.exports = WarehouseService;

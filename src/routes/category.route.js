@@ -4,8 +4,8 @@ const router = require('express').Router();
 
 router.get('/', CategoryController.getAllCategories);
 
-// router.get('/:id', CategoryController.getProductsBasedOnCategory);
-router.get('/:id', CategoryController.getCategoryDetail);
+router.get('/:id', CategoryController.getProductsBasedOnCategory);
+// router.get('/:id', CategoryController.getCategoryDetail);
 
 router.use(adminAuthorization);
 

@@ -181,4 +181,31 @@ describe('WarehouseController', () => {
       // expect(WarehouseService.deleteWarehouse).toHaveBeenCalledWith('1');
     });
   });
+
+  describe('getAllWarehouseQuantities', () => {
+    it('should return all warehouse quantities', async () => {
+      AuthService.findUserById.mockResolvedValueOnce({
+        id: 1,
+        username: 'admin',
+        role: 'admin',
+      });
+
+      const warehouseQuantities = [
+        { id: 1, product: 'Product A', quantity: 10 },
+        { id: 2, product: 'Product B', quantity: 20 },
+      ];
+      WarehouseService.productsWarehouse.mockResolvedValueOnce(warehouseQuantities);
+
+      const response = await request(app)
+        .get('/api/warehouses/quantities')
+        .set('Authorization', 'Bearer fakeToken');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        data: {},
+        message: 'Warehouse data successfully retrieved',
+        status: 'success',
+      });
+    });
+  });
 });
