@@ -503,6 +503,54 @@ class CheckoutService {
       }
     }
   }
+
+  static async deleteProduct(payload) {
+    try {
+      const checkout = await prisma.checkout.findUnique({
+        where: {
+          id: +payload.checkoutId,
+        },
+      });
+
+      if (!checkout)
+        throw new NotFoundError(
+          'No Checkout Found',
+          `Can't find Checkout with id ${payload.checkoutId}`,
+        );
+
+      let productCheckout = await prisma.productCheckout.findUnique({
+        where: {
+          productId_checkoutId: {
+            productId: +payload.productId,
+            checkoutId: +payload.checkoutId,
+          },
+        },
+      });
+
+      if (!productCheckout)
+        throw new NotFoundError(
+          'Product not found',
+          `There is no product with id ${payload.productId} on checkout Id ${payload.checkoutId}`,
+        );
+
+      productCheckout = await prisma.productCheckout.delete({
+        where: {
+          productId_checkoutId: {
+            productId: +payload.productId,
+            checkoutId: +payload.checkoutId,
+          },
+        },
+      });
+
+      return productCheckout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to add product to checkout', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = CheckoutService;
