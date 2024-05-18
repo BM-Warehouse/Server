@@ -12,11 +12,11 @@ class CategoryController {
       payload.page = +payload.page || DEFAULT_PAGE;
       payload.limit = +payload.limit || DEFAULT_LIMIT;
 
-      const categories = await CategoryService.getAllCategories(payload);
-      const pagination = getPaginationStatus(payload.page, payload.limit, categories.count);
+      const { categories, count } = await CategoryService.getAllCategories(payload);
+      const pagination = getPaginationStatus(payload.page, payload.limit, count);
       res
         .status(200)
-        .json(successResponse({ getAll: categories, pagination }, 'get all category successfully'));
+        .json(successResponse({ categories, pagination }, 'get all category successfully'));
     } catch (e) {
       next(e);
     }
