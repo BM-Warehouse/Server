@@ -142,39 +142,26 @@ class CheckoutService {
   }
   static async add(payload) {
     try {
-      const { total_price, status, user_id } = payload;
-      if (!total_price || !status || !user_id) {
+      const { userId, address, method, courier, status } = payload;
+      if (!userId || !address || !method || !courier || !status) {
         throw new BadRequest(
           'Invalid body parameter',
-          'total price, status, and user_id cannot be empty!',
+          'userId, address, method, courier, status cannot be empty!',
         );
       }
 
-      const existingCheckout = await prisma.checkout.findFirst({
-        where: {
-          user_id,
-          status: {
-            not: 'selesai',
-          },
-        },
-      });
-
-      if (existingCheckout) {
-        throw new ConflictError(
-          'Data conflict of checkout',
-          `There is already an ongoing checkout for user with id ${user_id}`,
-        );
-      }
-
-      const newCheckout = await prisma.checkout.create({
+      const checkout = await prisma.checkout.create({
         data: {
-          total_price,
+          userId,
+          address,
+          method,
+          courier,
           status,
-          user_id,
+          totalPrice: 0,
         },
       });
 
-      return newCheckout;
+      return checkout;
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Failed to add checkout to database', e);
