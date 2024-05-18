@@ -2,6 +2,7 @@ const AuthService = require('@services/auth.service');
 const bcrypt = require('@libs/bcrypt');
 const jwt = require('@libs/jwt');
 const { BadRequest, UnauthorizedError } = require('@exceptions/error.excecptions');
+const { successResponse } = require('@src/responses/responses');
 
 class AuthController {
   static async register(req, res, next) {
@@ -41,7 +42,7 @@ class AuthController {
         role,
       );
 
-      res.status(201).json({ data: user, message: 'User added successfully' });
+      res.status(201).json(successResponse(user, 'User added successfully'));
     } catch (e) {
       next(e);
     }
