@@ -16,6 +16,8 @@ router.get('/:checkoutId', userAuthorization, CheckoutController.getDetail);
 
 router.post('/', CheckoutController.add);
 
+router.post('/:id/addProduct', CheckoutController.addProduct);
+
 router.put('/:checkoutId', CheckoutController.update);
 
 router.delete('/:id', adminAuthorization, CheckoutController.remove);

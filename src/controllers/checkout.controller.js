@@ -122,6 +122,21 @@ class CheckoutController {
       next(err);
     }
   }
+
+  static async addProduct(req, res, next) {
+    try {
+      const { id } = req.params;
+      const productCheckout = await CheckoutService.addProduct(id, req.body);
+
+      res
+        .status(200)
+        .json(
+          successResponse({ productCheckout }, 'Data all user checkouts successfully retrieved'),
+        );
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = CheckoutController;
