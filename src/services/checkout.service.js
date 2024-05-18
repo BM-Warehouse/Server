@@ -503,6 +503,127 @@ class CheckoutService {
       }
     }
   }
+
+  static async editProduct(payload) {
+    try {
+      const checkout = await prisma.checkout.findUnique({
+        where: {
+          id: +payload.checkoutId,
+        },
+      });
+
+      if (!checkout)
+        throw new NotFoundError(
+          'No Checkout Found',
+          `Can't find Checkout with id ${payload.checkoutId}`,
+        );
+
+      const product = await prisma.product.findUnique({
+        where: {
+          id: +payload.productId,
+        },
+      });
+
+      if (!product)
+        throw new NotFoundError(
+          'No Product Found',
+          `Can't find Product with id ${payload.productId}`,
+        );
+
+      const productCheckout = await prisma.$transaction(async (tx) => {
+        let productCheckout = await tx.productCheckout.findUnique({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
+          },
+        });
+
+        // update checkout data dlu buat pricenya
+        await tx.checkout.update({
+          where: {
+            id: +payload.checkoutId,
+          },
+          data: {
+            totalPrice: {
+              increment: (+payload.quantity - productCheckout.quantityItem) * product.price,
+            },
+          },
+        });
+
+        productCheckout = await tx.productCheckout.update({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
+          },
+          data: {
+            quantityItem: +payload.quantity,
+            productPrice: +payload.quantity * product.price,
+          },
+        });
+        return productCheckout;
+      });
+
+      return productCheckout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed update product checkout', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async deleteProduct(payload) {
+    try {
+      const checkout = await prisma.checkout.findUnique({
+        where: {
+          id: +payload.checkoutId,
+        },
+      });
+
+      if (!checkout)
+        throw new NotFoundError(
+          'No Checkout Found',
+          `Can't find Checkout with id ${payload.checkoutId}`,
+        );
+
+      let productCheckout = await prisma.productCheckout.findUnique({
+        where: {
+          productId_checkoutId: {
+            productId: +payload.productId,
+            checkoutId: +payload.checkoutId,
+          },
+        },
+      });
+
+      if (!productCheckout)
+        throw new NotFoundError(
+          'Product not found',
+          `There is no product with id ${payload.productId} on checkout Id ${payload.checkoutId}`,
+        );
+
+      productCheckout = await prisma.productCheckout.delete({
+        where: {
+          productId_checkoutId: {
+            productId: +payload.productId,
+            checkoutId: +payload.checkoutId,
+          },
+        },
+      });
+
+      return productCheckout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to add product to checkout', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = CheckoutService;

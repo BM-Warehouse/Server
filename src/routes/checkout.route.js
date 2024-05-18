@@ -18,6 +18,10 @@ router.post('/', CheckoutController.add);
 
 router.post('/:id/addProduct', CheckoutController.addProduct);
 
+router.put('/editProduct', CheckoutController.editProduct);
+
+router.delete('/deleteProduct', CheckoutController.deleteProduct);
+
 router.put('/:checkoutId', CheckoutController.update);
 
 router.delete('/:id', adminAuthorization, CheckoutController.remove);
