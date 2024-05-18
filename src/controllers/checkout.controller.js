@@ -147,6 +147,16 @@ class CheckoutController {
       next(err);
     }
   }
+
+  static async editProduct(req, res, next) {
+    try {
+      const productCheckout = await CheckoutService.editProduct(req.body);
+
+      res.status(200).json(successResponse({ productCheckout }, 'product successfully updated'));
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = CheckoutController;
