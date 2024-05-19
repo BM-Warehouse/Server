@@ -613,13 +613,26 @@ class CheckoutService {
           `There is no product with id ${payload.productId} on checkout Id ${payload.checkoutId}`,
         );
 
-      productCheckout = await prisma.productCheckout.delete({
-        where: {
-          productId_checkoutId: {
-            productId: +payload.productId,
-            checkoutId: +payload.checkoutId,
+      await prisma.$transaction(async (tx) => {
+        productCheckout = await tx.productCheckout.delete({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
           },
-        },
+        });
+
+        await tx.checkout.update({
+          where: {
+            id: +payload.checkoutId,
+          },
+          data: {
+            totalPrice: {
+              decrement: productCheckout.productPrice,
+            },
+          },
+        });
       });
 
       return productCheckout;
