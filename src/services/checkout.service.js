@@ -7,6 +7,7 @@ const {
   ConflictError,
 } = require('@exceptions/error.excecptions');
 const checkoutStatus = require('@constants/checkoutStatus');
+const { emailSendOrderInfoToUser } = require('@src/libs/mailer');
 
 class CheckoutService {
   static async #takeFromBatches(productId, warehouseId, quantityToTake, tx) {
@@ -313,18 +314,6 @@ class CheckoutService {
   static async send({ checkoutId, warehouseSelections }) {
     try {
       await prisma.$transaction(async (tx) => {
-        // --- ubah status dan tambah nomor resi
-        const resi = `${+new Date()}`;
-        await tx.checkout.update({
-          where: {
-            id: +checkoutId,
-          },
-          data: {
-            status: checkoutStatus.SENT,
-            resi,
-          },
-        });
-
         // --- update warehouse pilihan untuk setiap produk yang dipilih
         for (const w of warehouseSelections) {
           await tx.productCheckout.update({
@@ -339,6 +328,37 @@ class CheckoutService {
             },
           });
         }
+
+        // --- ubah status dan tambah nomor resi
+        const resi = `${+new Date()}`;
+        const checkout = await tx.checkout.update({
+          where: {
+            id: +checkoutId,
+          },
+          data: {
+            status: checkoutStatus.SENT,
+            resi,
+          },
+          include: {
+            user: true,
+            productCheckout: {
+              include: {
+                product: {
+                  select: {
+                    name: true,
+                  },
+                },
+                warehouse: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        emailSendOrderInfoToUser(checkout);
 
         //--- ambil produk yang di checkout
         const productCheckouts = await tx.productCheckout.findMany({
