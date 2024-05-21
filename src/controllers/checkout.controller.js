@@ -1,5 +1,5 @@
 const CheckoutService = require('@services/checkout.service');
-const { BadRequest } = require('@exceptions/error.excecptions');
+const { BadRequest, NotFoundError } = require('@exceptions/error.excecptions');
 const { successResponse } = require('@responses/responses');
 const { getPaginationStatus } = require('@src/libs/pagination');
 
@@ -118,6 +118,25 @@ class CheckoutController {
       res
         .status(200)
         .json(successResponse({ checkoutsUser }, 'Data all user checkouts successfully retrieved'));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getUserDetailCheckout(req, res, next) {
+    try {
+      const { userId } = req.loggedUser;
+      const { id } = req.params;
+
+      const checkoutDetail = await CheckoutService.getUserDetailCheckout(userId, +id);
+
+      if (!checkoutDetail) {
+        throw new NotFoundError('No Checkout Found', `Can't find Checkout with id ${id}`);
+      }
+
+      res
+        .status(200)
+        .json(successResponse({ checkoutDetail }, 'Checkout detail successfully retrieved'));
     } catch (err) {
       next(err);
     }
