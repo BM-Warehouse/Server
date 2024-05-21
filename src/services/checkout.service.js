@@ -256,7 +256,7 @@ class CheckoutService {
         // --- buat record di checkout
         const checkout = await tx.checkout.create({
           data: {
-            status: checkoutStatus.PACKING,
+            status: checkoutStatus.WAIT_FOR_PAYMENT,
             totalPrice: cart.totalPrice,
             userId: cart.userId,
             address,
