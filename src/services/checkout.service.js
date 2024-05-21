@@ -208,6 +208,37 @@ class CheckoutService {
     }
   }
 
+  static async confirmPayment(id) {
+    try {
+      let checkout = await prisma.checkout.findFirst({
+        where: {
+          id: +id,
+        },
+      });
+
+      if (!checkout) {
+        throw new NotFoundError('No Checkout found', `There is no checkout with id ${id}`);
+      }
+
+      checkout = await prisma.checkout.update({
+        where: {
+          id: +id,
+        },
+        data: {
+          status: checkoutStatus.PACKING,
+        },
+      });
+
+      return checkout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to update checkout', e);
+      } else {
+        throw e;
+      }
+    }
+  }
+
   static async remove(id) {
     try {
       const checkout = await prisma.checkout.findFirst({
