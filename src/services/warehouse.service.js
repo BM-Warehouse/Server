@@ -1,3 +1,4 @@
+const { NotFoundError } = require('@src/exceptions/error.excecptions');
 const prisma = require('@src/libs/prisma');
 
 class WarehouseService {
@@ -83,11 +84,28 @@ class WarehouseService {
 
   static async getWarehouseDetail(id) {
     try {
-      const warehouse = await prisma.warehouse.findFirst({
+      const warehouse = await prisma.warehouse.findMany({
         where: {
           id: +id,
         },
+        include: {
+          productsWarehouses: {
+            select: {
+              quantity: true,
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
       });
+
+      if (!warehouse) {
+        throw new NotFoundError('Cannot find warehouse with that ID!');
+      }
       return warehouse;
     } catch (e) {
       throw new e();
