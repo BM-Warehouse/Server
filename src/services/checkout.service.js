@@ -82,6 +82,7 @@ class CheckoutService {
         take: limit,
         include: {
           user: true,
+          couriers: true,
         },
       });
 
@@ -473,6 +474,7 @@ class CheckoutService {
               product: true,
             },
           },
+          couriers: true,
         },
       });
 
@@ -499,6 +501,7 @@ class CheckoutService {
               product: true,
             },
           },
+          couriers: true,
         },
       });
 
