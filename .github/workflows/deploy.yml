@@ -42,3 +42,4 @@ jobs:
             docker stop bmwarehouse_container || true
             docker rm bmwarehouse_container || true
             docker run -d -p 5000:5000 --name bmwarehouse_container "${{ secrets.DOCKER_USERNAME }}/bm_warehouse_api:latest"
+            docker images | grep bm_warehouse_api | awk '{print $3}' | tail -n +2 | xargs -I {} docker rmi {}
