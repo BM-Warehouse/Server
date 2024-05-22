@@ -465,12 +465,45 @@ class CheckoutService {
         where: {
           userId,
         },
+        include: {
+          productCheckout: {
+            include: {
+              product: true,
+            },
+          },
+        },
       });
 
       return checkouts;
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Failed to get user checkouts', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async getUserDetailCheckout(userId, checkoutId) {
+    try {
+      const checkout = await prisma.checkout.findFirst({
+        where: {
+          id: checkoutId,
+          userId,
+        },
+        include: {
+          productCheckout: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      });
+
+      return checkout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to get checkout detail', e.message);
       } else {
         throw e;
       }

@@ -6,6 +6,8 @@ router.get('/', CheckoutController.getAll);
 
 router.get('/me', CheckoutController.getUserCheckouts);
 
+router.get('/me/:id', CheckoutController.getUserDetailCheckout);
+
 // router.post('/action', userAuthorization, CheckoutController.action);
 router.post('/action', CheckoutController.action);
 
