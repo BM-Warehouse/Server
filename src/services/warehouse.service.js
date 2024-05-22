@@ -1,3 +1,4 @@
+const { ClientError, InternalServerError } = require('@src/exceptions/error.excecptions');
 const prisma = require('@src/libs/prisma');
 
 class WarehouseService {
@@ -78,6 +79,33 @@ class WarehouseService {
       return { warehouses, count };
     } catch (e) {
       throw new Error('Failed to retrieve warehouses');
+    }
+  }
+
+  static async getBatch(payload, filter) {
+    try {
+      const batches = await prisma.batch.findMany({
+        skip: (filter.page - 1) * filter.limit,
+        take: filter.limit,
+        where: {
+          productId: +payload.productId,
+          warehouseId: +payload.warehouseId,
+        },
+      });
+
+      const count = await prisma.batch.count({
+        where: {
+          productId: +payload.productId,
+          warehouseId: +payload.warehouseId,
+        },
+      });
+      return { batches, count };
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Fail to grab batches data', e.message);
+      } else {
+        throw e;
+      }
     }
   }
 
