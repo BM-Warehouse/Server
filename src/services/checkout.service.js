@@ -163,7 +163,7 @@ class CheckoutService {
           userId,
           address,
           method,
-          courierId,
+          courierId: +courierId,
           status,
           totalPrice: courier.price,
         },
