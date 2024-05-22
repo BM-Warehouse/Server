@@ -344,6 +344,8 @@ class CheckoutService {
 
   static async send({ checkoutId, warehouseSelections }) {
     try {
+      if (warehouseSelections.length === 0)
+        throw new BadRequest('Empty Warehouse Selection', 'Warehouse Selection cannot be empty');
       await prisma.$transaction(async (tx) => {
         // --- update warehouse pilihan untuk setiap produk yang dipilih
         for (const w of warehouseSelections) {
