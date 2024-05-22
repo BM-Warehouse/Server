@@ -1,5 +1,5 @@
 const CheckoutService = require('@services/checkout.service');
-const { BadRequest } = require('@exceptions/error.excecptions');
+const { BadRequest, NotFoundError } = require('@exceptions/error.excecptions');
 const { successResponse } = require('@responses/responses');
 const { getPaginationStatus } = require('@src/libs/pagination');
 
@@ -74,6 +74,16 @@ class CheckoutController {
     }
   }
 
+  static async confirmPayment(req, res, next) {
+    try {
+      const id = req.params.checkoutId;
+      const checkout = await CheckoutService.confirmPayment(id);
+      res.status(200).json(successResponse(checkout, 'Checkout Payment Confirmed successfully'));
+    } catch (e) {
+      next(e);
+    }
+  }
+
   static async remove(req, res, next) {
     try {
       const id = req.params.id;
@@ -118,6 +128,60 @@ class CheckoutController {
       res
         .status(200)
         .json(successResponse({ checkoutsUser }, 'Data all user checkouts successfully retrieved'));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getUserDetailCheckout(req, res, next) {
+    try {
+      const { userId } = req.loggedUser;
+      const { id } = req.params;
+
+      const checkoutDetail = await CheckoutService.getUserDetailCheckout(userId, +id);
+
+      if (!checkoutDetail) {
+        throw new NotFoundError('No Checkout Found', `Can't find Checkout with id ${id}`);
+      }
+
+      res
+        .status(200)
+        .json(successResponse({ checkoutDetail }, 'Checkout detail successfully retrieved'));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async addProduct(req, res, next) {
+    try {
+      const { id } = req.params;
+      const productCheckout = await CheckoutService.addProduct(id, req.body);
+
+      res
+        .status(200)
+        .json(
+          successResponse({ productCheckout }, 'Data all user checkouts successfully retrieved'),
+        );
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async deleteProduct(req, res, next) {
+    try {
+      const productCheckout = await CheckoutService.deleteProduct(req.body);
+
+      res.status(200).json(successResponse({ productCheckout }, 'product successfully deleted'));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async editProduct(req, res, next) {
+    try {
+      const productCheckout = await CheckoutService.editProduct(req.body);
+
+      res.status(200).json(successResponse({ productCheckout }, 'product successfully updated'));
     } catch (err) {
       next(err);
     }

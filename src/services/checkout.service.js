@@ -7,6 +7,7 @@ const {
   ConflictError,
 } = require('@exceptions/error.excecptions');
 const checkoutStatus = require('@constants/checkoutStatus');
+const { emailSendOrderInfoToUser } = require('@src/libs/mailer');
 
 class CheckoutService {
   static async #takeFromBatches(productId, warehouseId, quantityToTake, tx) {
@@ -142,39 +143,26 @@ class CheckoutService {
   }
   static async add(payload) {
     try {
-      const { total_price, status, user_id } = payload;
-      if (!total_price || !status || !user_id) {
+      const { userId, address, method, courier, status } = payload;
+      if (!userId || !address || !method || !courier || !status) {
         throw new BadRequest(
           'Invalid body parameter',
-          'total price, status, and user_id cannot be empty!',
+          'userId, address, method, courier, status cannot be empty!',
         );
       }
 
-      const existingCheckout = await prisma.checkout.findFirst({
-        where: {
-          user_id,
-          status: {
-            not: 'selesai',
-          },
-        },
-      });
-
-      if (existingCheckout) {
-        throw new ConflictError(
-          'Data conflict of checkout',
-          `There is already an ongoing checkout for user with id ${user_id}`,
-        );
-      }
-
-      const newCheckout = await prisma.checkout.create({
+      const checkout = await prisma.checkout.create({
         data: {
-          total_price,
+          userId,
+          address,
+          method,
+          courier,
           status,
-          user_id,
+          totalPrice: 0,
         },
       });
 
-      return newCheckout;
+      return checkout;
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Failed to add checkout to database', e);
@@ -207,6 +195,37 @@ class CheckoutService {
         data: {
           total_price,
           status,
+        },
+      });
+
+      return checkout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to update checkout', e);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async confirmPayment(id) {
+    try {
+      let checkout = await prisma.checkout.findFirst({
+        where: {
+          id: +id,
+        },
+      });
+
+      if (!checkout) {
+        throw new NotFoundError('No Checkout found', `There is no checkout with id ${id}`);
+      }
+
+      checkout = await prisma.checkout.update({
+        where: {
+          id: +id,
+        },
+        data: {
+          status: checkoutStatus.PACKING,
         },
       });
 
@@ -268,7 +287,7 @@ class CheckoutService {
         // --- buat record di checkout
         const checkout = await tx.checkout.create({
           data: {
-            status: checkoutStatus.PACKING,
+            status: checkoutStatus.WAIT_FOR_PAYMENT,
             totalPrice: cart.totalPrice,
             userId: cart.userId,
             address,
@@ -326,18 +345,6 @@ class CheckoutService {
   static async send({ checkoutId, warehouseSelections }) {
     try {
       await prisma.$transaction(async (tx) => {
-        // --- ubah status dan tambah nomor resi
-        const resi = `${+new Date()}`;
-        await tx.checkout.update({
-          where: {
-            id: +checkoutId,
-          },
-          data: {
-            status: checkoutStatus.SENT,
-            resi,
-          },
-        });
-
         // --- update warehouse pilihan untuk setiap produk yang dipilih
         for (const w of warehouseSelections) {
           await tx.productCheckout.update({
@@ -352,6 +359,37 @@ class CheckoutService {
             },
           });
         }
+
+        // --- ubah status dan tambah nomor resi
+        const resi = `${+new Date()}`;
+        const checkout = await tx.checkout.update({
+          where: {
+            id: +checkoutId,
+          },
+          data: {
+            status: checkoutStatus.SENT,
+            resi,
+          },
+          include: {
+            user: true,
+            productCheckout: {
+              include: {
+                product: {
+                  select: {
+                    name: true,
+                  },
+                },
+                warehouse: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        emailSendOrderInfoToUser(checkout);
 
         //--- ambil produk yang di checkout
         const productCheckouts = await tx.productCheckout.findMany({
@@ -427,12 +465,244 @@ class CheckoutService {
         where: {
           userId,
         },
+        include: {
+          productCheckout: {
+            include: {
+              product: true,
+            },
+          },
+        },
       });
 
       return checkouts;
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Failed to get user checkouts', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async getUserDetailCheckout(userId, checkoutId) {
+    try {
+      const checkout = await prisma.checkout.findFirst({
+        where: {
+          id: checkoutId,
+          userId,
+        },
+        include: {
+          productCheckout: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      });
+
+      return checkout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to get checkout detail', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async addProduct(id, payload) {
+    try {
+      const checkout = await prisma.checkout.findUnique({
+        where: {
+          id: +id,
+        },
+      });
+
+      if (!checkout)
+        throw new NotFoundError('No Checkout Found', `Can't find Checkout with id ${id}`);
+
+      const product = await prisma.product.findUnique({
+        where: {
+          id: +payload.productId,
+        },
+      });
+
+      const productCheckout = await prisma.$transaction(async (tx) => {
+        const productCheckout = await tx.productCheckout.upsert({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
+          },
+          update: {
+            quantityItem: {
+              increment: +payload.quantity,
+            },
+            productPrice: {
+              increment: +payload.quantity * product.price,
+            },
+          },
+          create: {
+            productId: +payload.productId,
+            checkoutId: +payload.checkoutId,
+            quantityItem: +payload.quantity,
+            productPrice: +payload.quantity * product.price,
+          },
+        });
+
+        await tx.checkout.update({
+          where: {
+            id: +id,
+          },
+          data: {
+            totalPrice: {
+              increment: +payload.quantity * product.price,
+            },
+          },
+        });
+
+        return productCheckout;
+      });
+
+      return productCheckout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to add product to checkout', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async editProduct(payload) {
+    try {
+      const checkout = await prisma.checkout.findUnique({
+        where: {
+          id: +payload.checkoutId,
+        },
+      });
+
+      if (!checkout)
+        throw new NotFoundError(
+          'No Checkout Found',
+          `Can't find Checkout with id ${payload.checkoutId}`,
+        );
+
+      const product = await prisma.product.findUnique({
+        where: {
+          id: +payload.productId,
+        },
+      });
+
+      if (!product)
+        throw new NotFoundError(
+          'No Product Found',
+          `Can't find Product with id ${payload.productId}`,
+        );
+
+      const productCheckout = await prisma.$transaction(async (tx) => {
+        let productCheckout = await tx.productCheckout.findUnique({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
+          },
+        });
+
+        // update checkout data dlu buat pricenya
+        await tx.checkout.update({
+          where: {
+            id: +payload.checkoutId,
+          },
+          data: {
+            totalPrice: {
+              increment: (+payload.quantity - productCheckout.quantityItem) * product.price,
+            },
+          },
+        });
+
+        productCheckout = await tx.productCheckout.update({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
+          },
+          data: {
+            quantityItem: +payload.quantity,
+            productPrice: +payload.quantity * product.price,
+          },
+        });
+        return productCheckout;
+      });
+
+      return productCheckout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed update product checkout', e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static async deleteProduct(payload) {
+    try {
+      const checkout = await prisma.checkout.findUnique({
+        where: {
+          id: +payload.checkoutId,
+        },
+      });
+
+      if (!checkout)
+        throw new NotFoundError(
+          'No Checkout Found',
+          `Can't find Checkout with id ${payload.checkoutId}`,
+        );
+
+      let productCheckout = await prisma.productCheckout.findUnique({
+        where: {
+          productId_checkoutId: {
+            productId: +payload.productId,
+            checkoutId: +payload.checkoutId,
+          },
+        },
+      });
+
+      if (!productCheckout)
+        throw new NotFoundError(
+          'Product not found',
+          `There is no product with id ${payload.productId} on checkout Id ${payload.checkoutId}`,
+        );
+
+      await prisma.$transaction(async (tx) => {
+        productCheckout = await tx.productCheckout.delete({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
+          },
+        });
+
+        await tx.checkout.update({
+          where: {
+            id: +payload.checkoutId,
+          },
+          data: {
+            totalPrice: {
+              decrement: productCheckout.productPrice,
+            },
+          },
+        });
+      });
+
+      return productCheckout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to add product to checkout', e.message);
       } else {
         throw e;
       }

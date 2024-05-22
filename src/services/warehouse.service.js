@@ -1,16 +1,83 @@
 const prisma = require('@src/libs/prisma');
 
 class WarehouseService {
+  // static async getAllWarehouses({ page, limit }) {
+  //   try {
+  //     const warehouses = await prisma.warehouse.findMany({
+  //       skip: (page - 1) * limit,
+  //       take: limit,
+  //     });
+  //     const count = await prisma.warehouse.count();
+  //     return { warehouses, count };
+  //   } catch (e) {
+  //     throw new e();
+  //   }
+  // }
+
   static async getAllWarehouses({ page, limit }) {
     try {
       const warehouses = await prisma.warehouse.findMany({
         skip: (page - 1) * limit,
         take: limit,
+        include: {
+          productsWarehouses: {
+            select: {
+              quantity: true,
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          // batches: {
+          //   select: {
+          //     id: true,
+          //     batchName: true,
+          //     stock: true,
+          //     expireDate: true,
+          //   },
+          // },
+          // outgoingRecord: {
+          //   select: {
+          //     id: true,
+          //     status: true,
+          //     quantity: true,
+          //     product: {
+          //       select: {
+          //         id: true,
+          //         name: true,
+          //       },
+          //     },
+          //   },
+          // },
+          // productCheckouts: {
+          //   select: {
+          //     quantityItem: true,
+          //     productPrice: true,
+          //     product: {
+          //       select: {
+          //         id: true,
+          //         name: true,
+          //       },
+          //     },
+          //     checkout: {
+          //       select: {
+          //         id: true, // if needed, otherwise remove
+          //         status: true,
+          //       },
+          //     },
+          //   },
+          // },
+        },
       });
+
       const count = await prisma.warehouse.count();
+
       return { warehouses, count };
     } catch (e) {
-      throw new e();
+      throw new Error('Failed to retrieve warehouses');
     }
   }
 

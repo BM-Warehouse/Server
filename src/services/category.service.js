@@ -166,9 +166,24 @@ class CategoryService {
         },
         select: {
           name: true,
+          description: true,
+          imageUrl: true,
           productCategories: {
             select: {
-              product: true,
+              product: {
+                include: {
+                  productCategories: {
+                    select: {
+                      category: {
+                        select: {
+                          id: true,
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
         },

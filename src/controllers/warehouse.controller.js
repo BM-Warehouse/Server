@@ -6,6 +6,31 @@ const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
 
 class WarehouseController {
+  // static async getAllWarehouses(req, res, next) {
+  //   try {
+  //     let { page, limit } = req.query;
+
+  //     page = +page || DEFAULT_PAGE;
+  //     limit = +limit || DEFAULT_LIMIT;
+
+  //     const warehouses = await WarehouseService.getAllWarehouses({
+  //       page,
+  //       limit,
+  //     });
+
+  //     const pagination = getPaginationStatus(page, limit, warehouses.count);
+
+  //     // res.status(200).json({ message: 'ok', warehouses, pagination });
+  //     res
+  //       .status(200)
+  //       .json(
+  //         successResponse({ warehouses, pagination }, 'All warehouses data successfully retrieved'),
+  //       );
+  //   } catch (e) {
+  //     next(e);
+  //   }
+  // }
+
   static async getAllWarehouses(req, res, next) {
     try {
       let { page, limit } = req.query;
@@ -13,14 +38,10 @@ class WarehouseController {
       page = +page || DEFAULT_PAGE;
       limit = +limit || DEFAULT_LIMIT;
 
-      const warehouses = await WarehouseService.getAllWarehouses({
-        page,
-        limit,
-      });
+      const warehouses = await WarehouseService.getAllWarehouses({ page, limit });
 
       const pagination = getPaginationStatus(page, limit, warehouses.count);
 
-      // res.status(200).json({ message: 'ok', warehouses, pagination });
       res
         .status(200)
         .json(
