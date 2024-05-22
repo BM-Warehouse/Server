@@ -74,6 +74,16 @@ class CheckoutController {
     }
   }
 
+  static async confirmPayment(req, res, next) {
+    try {
+      const id = req.params.checkoutId;
+      const checkout = await CheckoutService.confirmPayment(id);
+      res.status(200).json(successResponse(checkout, 'Checkout Payment Confirmed successfully'));
+    } catch (e) {
+      next(e);
+    }
+  }
+
   static async remove(req, res, next) {
     try {
       const id = req.params.id;

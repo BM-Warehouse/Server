@@ -208,6 +208,37 @@ class CheckoutService {
     }
   }
 
+  static async confirmPayment(id) {
+    try {
+      let checkout = await prisma.checkout.findFirst({
+        where: {
+          id: +id,
+        },
+      });
+
+      if (!checkout) {
+        throw new NotFoundError('No Checkout found', `There is no checkout with id ${id}`);
+      }
+
+      checkout = await prisma.checkout.update({
+        where: {
+          id: +id,
+        },
+        data: {
+          status: checkoutStatus.PACKING,
+        },
+      });
+
+      return checkout;
+    } catch (e) {
+      if (!(e instanceof ClientError)) {
+        throw new InternalServerError('Failed to update checkout', e);
+      } else {
+        throw e;
+      }
+    }
+  }
+
   static async remove(id) {
     try {
       const checkout = await prisma.checkout.findFirst({
@@ -256,7 +287,7 @@ class CheckoutService {
         // --- buat record di checkout
         const checkout = await tx.checkout.create({
           data: {
-            status: checkoutStatus.PACKING,
+            status: checkoutStatus.WAIT_FOR_PAYMENT,
             totalPrice: cart.totalPrice,
             userId: cart.userId,
             address,
@@ -646,13 +677,26 @@ class CheckoutService {
           `There is no product with id ${payload.productId} on checkout Id ${payload.checkoutId}`,
         );
 
-      productCheckout = await prisma.productCheckout.delete({
-        where: {
-          productId_checkoutId: {
-            productId: +payload.productId,
-            checkoutId: +payload.checkoutId,
+      await prisma.$transaction(async (tx) => {
+        productCheckout = await tx.productCheckout.delete({
+          where: {
+            productId_checkoutId: {
+              productId: +payload.productId,
+              checkoutId: +payload.checkoutId,
+            },
           },
-        },
+        });
+
+        await tx.checkout.update({
+          where: {
+            id: +payload.checkoutId,
+          },
+          data: {
+            totalPrice: {
+              decrement: productCheckout.productPrice,
+            },
+          },
+        });
       });
 
       return productCheckout;

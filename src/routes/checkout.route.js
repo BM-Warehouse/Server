@@ -25,6 +25,7 @@ router.put('/editProduct', CheckoutController.editProduct);
 
 router.delete('/deleteProduct', CheckoutController.deleteProduct);
 
+router.put('/:checkoutId/confirm', CheckoutController.confirmPayment);
 router.put('/:checkoutId', CheckoutController.update);
 
 router.delete('/:id', adminAuthorization, CheckoutController.remove);
