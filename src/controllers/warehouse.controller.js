@@ -52,6 +52,32 @@ class WarehouseController {
     }
   }
 
+  static async getBatch(req, res, next) {
+    try {
+      let { page, limit } = req.query;
+
+      page = +page || DEFAULT_PAGE;
+      limit = +limit || DEFAULT_LIMIT;
+
+      const filter = {
+        page,
+        limit,
+      };
+
+      const batches = await WarehouseService.getBatch(req.body, filter);
+
+      const pagination = getPaginationStatus(page, limit, batches.count);
+
+      res
+        .status(200)
+        .json(
+          successResponse({ batches, pagination }, 'All warehouses data successfully retrieved'),
+        );
+    } catch (e) {
+      next(e);
+    }
+  }
+
   static async getWarehouseDetail(req, res, next) {
     try {
       const { id } = req.params;
