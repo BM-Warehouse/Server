@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const formatRupiah = require('./formatRupiah');
 
 function formatBathesDataAsTable(data) {
   let tableHTML = `
@@ -69,6 +70,62 @@ async function sendBatchtoEmailList(batches, mailList) {
   }
 }
 
+function composeOrderInfo(productCheckout) {
+  let tableHTML = `
+    <table border="1" cellspacing="0" cellpadding="5">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Product Name</th>
+          <th>Quantity</th>
+          <th>Total Price</th>
+          <th>Warehouse Source</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  productCheckout.forEach((item, i) => {
+    tableHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${item.product.name}</td>
+        <td>${item.quantityItem}</td>
+        <td>${formatRupiah(item.productPrice)}</td>
+        <td>${item.warehouse.name}</td>
+      </tr>
+    `;
+  });
+
+  tableHTML += `
+      </tbody>
+    </table>
+  `;
+
+  return tableHTML;
+}
+
+async function emailSendOrderInfoToUser(checkout) {
+  const mail = checkout.user.email;
+  const username = checkout.user.username;
+  const resi = checkout.resi;
+  let html = `<p>Thank you for your order <b>${username}</b>,<br>`;
+  html += `<p>Your order is being delivered with Delibery Number <b>${resi}</b></p>`;
+  html += '<p>Here are your detail order</p>';
+  html += composeOrderInfo(checkout.productCheckout);
+  html += `Total Order Price: <b>${formatRupiah(checkout.totalPrice)}</b>`;
+
+  const mailOptions = {
+    from: 'warehousebabymom@gmail.com',
+    to: mail,
+    subject: `Order Detail #${resi}`,
+    html: `<p>${html}</p>`, // Content
+  };
+  // Send email
+  transporter.sendMail(mailOptions, () => {});
+}
+
 module.exports = {
   sendBatchtoEmailList,
+  emailSendOrderInfoToUser,
 };
