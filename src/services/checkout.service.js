@@ -315,6 +315,7 @@ class CheckoutService {
           data: {
             status: checkoutStatus.WAIT_FOR_PAYMENT,
             totalPrice: cart.totalPrice + courier.price,
+            totalProductPrice: cart.totalPrice,
             userId: cart.userId,
             address,
             courierId,
