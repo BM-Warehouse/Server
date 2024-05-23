@@ -7,10 +7,12 @@ const checkoutRoute = require('@routes/checkout.route');
 const warehouseRoute = require('@routes/warehouse.route');
 const cartRoute = require('@routes/cart.route');
 const courierRoute = require('@routes/courier.route');
+const recaptchaRouter = require('@routes/recapthca.route');
 const { authentication } = require('@middlewares/auth');
 
 /****** Koleksi Route disini *******/
 router.use('/api', authRoute);
+router.use('/api/recaptcha', recaptchaRouter);
 router.use(authentication);
 router.use('/api/products', productRoute);
 router.use('/api/categories', categoryRoute);
