@@ -82,6 +82,7 @@ class CheckoutService {
         take: limit,
         include: {
           user: true,
+          couriers: true,
         },
       });
 
@@ -143,22 +144,28 @@ class CheckoutService {
   }
   static async add(payload) {
     try {
-      const { userId, address, method, courier, status } = payload;
-      if (!userId || !address || !method || !courier || !status) {
+      const { userId, address, method, courierId, status } = payload;
+      if (!userId || !address || !method || !courierId || !status) {
         throw new BadRequest(
           'Invalid body parameter',
-          'userId, address, method, courier, status cannot be empty!',
+          'userId, address, method, courierId, status cannot be empty!',
         );
       }
+
+      const courier = await prisma.courier.findUnique({
+        where: {
+          id: +courierId,
+        },
+      });
 
       const checkout = await prisma.checkout.create({
         data: {
           userId,
           address,
           method,
-          courier,
+          courierId: +courierId,
           status,
-          totalPrice: 0,
+          totalPrice: courier.price,
         },
       });
 
@@ -173,16 +180,24 @@ class CheckoutService {
   }
   static async update(id, payload) {
     try {
-      const { total_price, status } = payload;
-      if (!total_price || !status) {
-        throw new BadRequest('Invalid body parameter', 'total price and status cannot be empty!');
-      }
+      const { method, address, courierId } = payload;
 
       let checkout = await prisma.checkout.findFirst({
         where: {
           id: +id,
         },
+        include: {
+          couriers: true,
+        },
       });
+
+      const courier = await prisma.courier.findUnique({
+        where: {
+          id: +courierId,
+        },
+      });
+
+      const dPrice = courier.price - checkout.couriers.price;
 
       if (!checkout) {
         throw new NotFoundError('No Checkout found', `There is no checkout with id ${id}`);
@@ -193,8 +208,12 @@ class CheckoutService {
           id: +id,
         },
         data: {
-          total_price,
-          status,
+          totalPrice: {
+            increment: dPrice,
+          },
+          method,
+          address,
+          courierId,
         },
       });
 
@@ -267,7 +286,7 @@ class CheckoutService {
     }
   }
 
-  static async action({ cartId, courier, address, method }) {
+  static async action({ cartId, courierId, address, method }) {
     try {
       const cart = await prisma.cart.findUnique({
         where: {
@@ -284,14 +303,21 @@ class CheckoutService {
       }
 
       const count = await prisma.$transaction(async (tx) => {
+        // --- check courier --- //
+        const courier = await tx.courier.findUnique({
+          where: {
+            id: +courierId,
+          },
+        });
+
         // --- buat record di checkout
         const checkout = await tx.checkout.create({
           data: {
             status: checkoutStatus.WAIT_FOR_PAYMENT,
-            totalPrice: cart.totalPrice,
+            totalPrice: cart.totalPrice + courier.price,
             userId: cart.userId,
             address,
-            courier,
+            courierId,
             method,
           },
         });
@@ -344,6 +370,8 @@ class CheckoutService {
 
   static async send({ checkoutId, warehouseSelections }) {
     try {
+      if (warehouseSelections.length === 0)
+        throw new BadRequest('Empty Warehouse Selection', 'Warehouse Selection cannot be empty');
       await prisma.$transaction(async (tx) => {
         // --- update warehouse pilihan untuk setiap produk yang dipilih
         for (const w of warehouseSelections) {
@@ -471,6 +499,7 @@ class CheckoutService {
               product: true,
             },
           },
+          couriers: true,
         },
       });
 
@@ -497,6 +526,7 @@ class CheckoutService {
               product: true,
             },
           },
+          couriers: true,
         },
       });
 

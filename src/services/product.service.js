@@ -106,7 +106,11 @@ class ProductService {
           id: +id,
         },
         include: {
-          productWarehouses: true,
+          productWarehouses: {
+            include: {
+              warehouse: true,
+            },
+          },
           productCategories: {
             select: {
               category: {

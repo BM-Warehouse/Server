@@ -20,6 +20,7 @@ jobs:
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "RECAPTCHA_SECRET_KEY=${{ secrets.RECAPTCHA_SECRET_KEY }}" >> .env
 
       # Build and push Docker image to Docker Hub
       - name: Build and push Docker image
@@ -42,3 +43,4 @@ jobs:
             docker stop bmwarehouse_container || true
             docker rm bmwarehouse_container || true
             docker run -d -p 5000:5000 --name bmwarehouse_container "${{ secrets.DOCKER_USERNAME }}/bm_warehouse_api:latest"
+            docker images | grep bm_warehouse_api | awk '{print $3}' | tail -n +2 | xargs -I {} docker rmi {}

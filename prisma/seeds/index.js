@@ -12,6 +12,7 @@ const seedProductCarts = require('./seedProductCarts');
 const seedProductCategories = require('./seedProductCategories');
 const seedProductCheckout = require('./seedProductCheckout');
 const seedProductWarehouses = require('./seedProductWarehouses');
+const seedCouriers = require('./seedCouriers');
 
 // menyesuaikan product stock dengan yang ada di gudang-gudang
 async function updateProductStock() {
@@ -43,6 +44,7 @@ async function main() {
   await seedCategories();
   await seedWarehouses();
   await seedUsers();
+  await seedCouriers();
   await seedCheckouts();
   await seedBatches();
   await seedCarts();
