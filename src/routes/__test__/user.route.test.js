@@ -177,10 +177,43 @@ describe('User API', () => {
         role: 'admin',
       });
 
+      // Mock the UserService.updateUser method
+      UserService.updateUser.mockImplementation(
+        async (
+          id,
+          username,
+          password,
+          fullName,
+          phone,
+          address,
+          gender,
+          birthdate,
+          avatar,
+          role,
+        ) => {
+          // Simulate hash password before saving
+          const hashPass = await bcrypt.hash(password, 10);
+          // Return a mock user object
+          return {
+            id,
+            username,
+            password: hashPass,
+            fullName,
+            phone,
+            address,
+            gender,
+            birthdate: new Date(birthdate),
+            avatar,
+            role,
+          };
+        },
+      );
+
       // Mock the return value of updateUser method
       UserService.updateUser.mockResolvedValueOnce({
         id: 1,
         username: 'updateduser',
+        password: 'tester123',
         fullName: 'Updated User',
         phone: '1234567890',
         address: '123 Updated St',
@@ -196,6 +229,7 @@ describe('User API', () => {
         .set('Authorization', 'Bearer fakeToken')
         .send({
           username: 'updateduser',
+          password: 'tester123',
           fullName: 'Updated User',
           phone: '1234567890',
           address: '123 Updated St',
@@ -213,7 +247,6 @@ describe('User API', () => {
       // expect(response.body.data).toHaveProperty('phone', '1234567890');
       // expect(response.body.data).toHaveProperty('address', '123 Updated St');
       // expect(response.body.data).toHaveProperty('gender', 'male');
-      // // Menyamakan langsung dengan nilai yang diharapkan
       // expect(response.body.data.birthdate).toEqual('1990-01-01T00:00:00.000Z');
       // expect(response.body.data).toHaveProperty('avatar', 'https://example.com/avatar.jpg');
       // expect(response.body.data).toHaveProperty('role', 'user');

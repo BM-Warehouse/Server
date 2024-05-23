@@ -20,6 +20,7 @@ jobs:
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "RECAPTCHA_SECRET_KEY=${{ secrets.RECAPTCHA_SECRET_KEY }}" >> .env
 
       # Build and push Docker image to Docker Hub
       - name: Build and push Docker image

@@ -33,7 +33,6 @@ class UserController {
         throw new BadRequest('Pagination Error', 'Failed to retrieve pagination status');
       }
 
-      // res.status(200).json({ message: 'Get all Users success', users, pagination });
       res.status(200).json(successResponse({ users, pagination }, 'Get all Users success'));
     } catch (e) {
       next(e);
@@ -49,7 +48,6 @@ class UserController {
       }
 
       const user = await UserService.getDetailUser(id);
-      // res.status(200).json(user);
       res.status(200).json(successResponse({ user }, 'Get detail User success'));
     } catch (e) {
       next(e);
@@ -91,7 +89,6 @@ class UserController {
         avatar,
         role,
       );
-      // res.status(201).json({ data: user, message: 'User added successfully' });
       res.status(201).json(successResponse({ user }, 'User added successfully'));
     } catch (e) {
       next(e);
@@ -103,6 +100,7 @@ class UserController {
       const { id } = req.params;
       const { username, password, fullName, phone, address, gender, birthdate, avatar, role } =
         req.body;
+      const hashPass = hashPassword(password);
 
       if (id && isNaN(id)) {
         throw new BadRequest('Invalid key parameter', 'ID must be a valid number');
@@ -111,7 +109,7 @@ class UserController {
       const user = await UserService.updateUser(
         id,
         username,
-        password,
+        hashPass,
         fullName,
         phone,
         address,
@@ -120,8 +118,6 @@ class UserController {
         avatar,
         role,
       );
-
-      // res.status(200).json({ data: user, message: 'User updated successfully' });
       res.status(200).json(successResponse({ user }, 'User updated successfully'));
     } catch (e) {
       next(e);
@@ -137,7 +133,6 @@ class UserController {
       }
 
       await UserService.destroyUser(id);
-      // res.status(200).json({ message: 'User deleted successfully' });
       res.status(200).json(successResponse('User deleted successfully'));
     } catch (e) {
       next(e);

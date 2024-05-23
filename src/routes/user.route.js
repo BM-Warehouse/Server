@@ -4,8 +4,6 @@ const router = require('express').Router();
 
 router.get('/me', UserController.getLoginUser);
 
-router.use(adminAuthorization);
-
 router.get('/', UserController.getAllUsers);
 
 router.get('/:id', UserController.getDetailUser);
