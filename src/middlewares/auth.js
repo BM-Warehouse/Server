@@ -102,16 +102,6 @@ class AuthMiddleware {
               `Checkout with id ${req.body.checkoutId} is not belong to user with id ${req.loggedUser.userId}.`,
             ),
           );
-        // } else if (req.body.cartId) {
-        //   if (req.body.cartId === req.loggedUser.cartId) next();
-        //   else {
-        //     next(
-        //       new ForbiddenError(
-        //         'Access denied',
-        //         `User with id ${req.loggedUser.userId} have no access to cart with id ${req.body.cartId}.`,
-        //       ),
-        //     );
-        //   }
       } else if (req.params.checkoutId) {
         const checkout = await prisma.checkout.findUnique({
           where: {
