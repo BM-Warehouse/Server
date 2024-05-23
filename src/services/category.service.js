@@ -93,7 +93,7 @@ class CategoryService {
             imageUrl,
           },
         });
-        return newCategory;
+        return { newCategory };
       }
     } catch (e) {
       if (!(e instanceof ClientError)) {
@@ -106,7 +106,7 @@ class CategoryService {
 
   static async editCategory(id, name, description, imageUrl) {
     try {
-      if (!id || !name || !description || !imageUrl) {
+      if (!id && !name && !description && !imageUrl) {
         throw new BadRequest(
           'Input is invalid',
           'Id, name, description, and image should not be empty!',
@@ -122,7 +122,7 @@ class CategoryService {
           imageUrl,
         },
       });
-      return editedCategory;
+      return { editedCategory };
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to edit category from db', e.message);
@@ -147,7 +147,7 @@ class CategoryService {
             id: +id,
           },
         });
-        return removed;
+        return { removed };
       }
     } catch (e) {
       if (!(e instanceof ClientError)) {

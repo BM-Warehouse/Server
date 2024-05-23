@@ -2,103 +2,60 @@ const prisma = require('@libs/prisma');
 
 const categories = [
   {
-    name: 'Electronics',
-    description: 'Explore the latest gadgets and electronics for your everyday needs.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/3/23/3b38658a-23e1-49d8-abb3-1d5974f3b315.jpg',
+    name: 'Diapers',
+    description: 'High-quality diapers to keep your baby comfortable and dry.',
+    imageUrl: 'https://res.cloudinary.com/denyah3ls/image/upload/v1716379427/diapers_h9tsmc.jpg',
   },
   {
-    name: 'Clothing',
-    description: 'Discover fashionable clothing for all occasions and seasons.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/3/23/3b38658a-23e1-49d8-abb3-1d5974f3b315.jpg',
+    name: 'Baby Wipes',
+    description: 'Soft and gentle baby wipes for easy cleaning.',
+    imageUrl: 'https://res.cloudinary.com/denyah3ls/image/upload/v1716379426/baby-wipes_w0ngnt.jpg',
   },
   {
-    name: 'Home & Kitchen',
-    description: 'Find everything you need to decorate and organize your home.',
+    name: 'Baby Bottles',
+    description: 'BPA-free bottles for safe feeding.',
     imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/3/23/3b38658a-23e1-49d8-abb3-1d5974f3b315.jpg',
+      'https://res.cloudinary.com/denyah3ls/image/upload/v1716379424/baby-bottles_cr47gj.jpg',
   },
   {
-    name: 'Sports & Outdoors',
-    description: 'Gear up for your favorite outdoor activities with top-notch equipment.',
+    name: 'Breast Pumps',
+    description: 'Efficient breast pumps for breastfeeding mothers.',
     imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/3/23/3b38658a-23e1-49d8-abb3-1d5974f3b315.jpg',
+      'https://res.cloudinary.com/denyah3ls/image/upload/v1716379425/breast_pumps_xo0ei1.jpg',
   },
   {
-    name: 'Books',
-    description:
-      'Dive into a world of knowledge and imagination with our vast collection of books.',
+    name: 'Baby Formula',
+    description: "Nutritional formula for your baby's growth.",
     imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/3/23/3b38658a-23e1-49d8-abb3-1d5974f3b315.jpg',
+      'https://res.cloudinary.com/denyah3ls/image/upload/v1716379424/baby_formula_cdambg.webp',
   },
   {
-    name: 'Beauty & Personal Care',
-    description:
-      'Discover beauty products to pamper yourself and enhance your personal care routine.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/3/23/3b38658a-23e1-49d8-abb3-1d5974f3b315.jpg',
+    name: 'Pacifiers',
+    description: 'Comforting pacifiers for soothing your baby.',
+    imageUrl: 'https://res.cloudinary.com/denyah3ls/image/upload/v1716379427/pacifiers_sl0gdm.jpg',
   },
   {
-    name: 'Toys & Games',
-    description: 'Entertain and educate with our selection of toys and games for all ages.',
+    name: 'Baby Clothes',
+    description: 'Soft and cute clothes for your baby.',
     imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2022/2/13/8ad49390-b0c1-437a-8734-0b3cee78298c.jpg',
+      'https://res.cloudinary.com/denyah3ls/image/upload/v1716379429/baby_clor_thes_stz8kw.webp',
   },
   {
-    name: 'Food & Grocery',
-    description: 'Shop for fresh groceries and delicious treats to satisfy your cravings.',
+    name: 'Baby Blankets',
+    description: 'Warm and cozy blankets for your baby.',
     imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2022/2/13/8ad49390-b0c1-437a-8734-0b3cee78298c.jpg',
+      'https://res.cloudinary.com/denyah3ls/image/upload/v1716379427/baby_blankets_utohu4.jpg',
   },
   {
-    name: 'Health & Fitness',
-    description:
-      'Achieve your health and fitness goals with our range of products and supplements.',
+    name: 'Baby Carriers',
+    description: 'Comfortable baby carriers for easy transport.',
     imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2022/2/13/8ad49390-b0c1-437a-8734-0b3cee78298c.jpg',
+      'https://res.cloudinary.com/denyah3ls/image/upload/v1716379424/baby_carriers_jsocoh.jpg',
   },
   {
-    name: 'Automotive',
-    description: 'Equip your car with the latest accessories and essentials for a smooth ride.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2022/2/13/8ad49390-b0c1-437a-8734-0b3cee78298c.jpg',
-  },
-  {
-    name: 'Furniture',
-    description: 'Furnish your living spaces with stylish and comfortable furniture pieces.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2022/2/13/8ad49390-b0c1-437a-8734-0b3cee78298c.jpg',
-  },
-  {
-    name: 'Pets',
-    description: 'Find everything you need to care for and spoil your furry friends.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2022/2/13/8ad49390-b0c1-437a-8734-0b3cee78298c.jpg',
-  },
-  {
-    name: 'Jewelry',
-    description: 'Adorn yourself with exquisite jewelry pieces for any occasion.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2022/2/13/8ad49390-b0c1-437a-8734-0b3cee78298c.jpg',
-  },
-  {
-    name: 'Tools & Home Improvement',
-    description: 'Tackle DIY projects and home repairs with our selection of tools and supplies.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/8/21/b3b2c09f-894e-4aeb-a3fc-dbcf92b4be80.png',
-  },
-  {
-    name: 'Baby',
-    description: 'Welcome your little one with essential baby products and gear.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/8/21/b3b2c09f-894e-4aeb-a3fc-dbcf92b4be80.png',
-  },
-  {
-    name: 'Office Products',
-    description: 'Stay organized and efficient with our range of office supplies and equipment.',
-    imageUrl:
-      'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/8/21/b3b2c09f-894e-4aeb-a3fc-dbcf92b4be80.png',
+    name: 'Strollers',
+    description: 'Convenient strollers for on-the-go parents.',
+    imageUrl: 'https://res.cloudinary.com/denyah3ls/image/upload/v1716379428/strollers_z7nti1.webp',
   },
 ];
 
