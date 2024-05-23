@@ -56,7 +56,10 @@ model Checkout {
   resi       String?
   method     String?
   address    String?
-  courier    String?
+
+  courierId  Int 
+  couriers   Courier @relation(fields: [courierId], references: [id], onDelete: Cascade)
+  
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -119,6 +122,15 @@ model Category {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   productCategories ProductCategory[]
+}
+
+model Courier {
+  id                Int               @id @default(autoincrement())
+  name              String
+  price             Int
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  checkouts         Checkout[]
 }
 
 model ProductCategory {
