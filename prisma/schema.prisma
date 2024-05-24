@@ -52,6 +52,7 @@ model Checkout {
   userId Int?
 
   totalPrice Int?
+  totalProductPrice  Int? 
   status     String?  @default("sedang dikemas")
   resi       String?
   method     String?

@@ -315,6 +315,7 @@ class CheckoutService {
           data: {
             status: checkoutStatus.WAIT_FOR_PAYMENT,
             totalPrice: cart.totalPrice + courier.price,
+            totalProductPrice: cart.totalPrice,
             userId: cart.userId,
             address,
             courierId,
@@ -350,12 +351,12 @@ class CheckoutService {
           },
         });
 
-        const productCheckout = tx.productCheckout.findMany({
-          where: {
-            checkoutId: checkout.id,
-          },
-        });
-        return productCheckout;
+        // const productCheckout = tx.productCheckout.findMany({
+        //   where: {
+        //     checkoutId: checkout.id,
+        //   },
+        // });
+        return checkout;
       });
 
       return count;
