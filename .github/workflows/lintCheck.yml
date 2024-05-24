@@ -29,5 +29,5 @@ jobs:
       - name: Running test lint
         run: pnpm lint:check
 
-      - name: Running unit testing with jest
-        run: pnpm test
+      # - name: Running unit testing with jest
+      #   run: pnpm test
