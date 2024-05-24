@@ -1,106 +1,99 @@
 /* eslint-disable no-undef */
 const request = require('supertest');
 const app = require('../../app');
-const ProductService = require('@services/product.service');
-const jwt = require('@libs/jwt.js');
-const bcrypt = require('@libs/bcrypt');
-const AuthService = require('@services/auth.service');
+const LOGIN_URL = '/api/login';
+const BASE_API_URL = '/api/products';
 
-// Mock the ProductService
-jest.mock('@services/product.service');
+let adminToken;
+// let userToken;
 
-// Mock the AuthService
-jest.mock('@services/auth.service');
+beforeAll(async () => {
+  let response = await request(app).post(LOGIN_URL).send({ username: 'admin', password: 'admin' });
 
-// Mock jwt verify token function
-jwt.verifyToken = jest.fn();
+  adminToken = response.body.accessToken;
 
-// Mock bcrypt hashPassword function
-bcrypt.hashPassword = jest.fn();
+  // response = await request(app).post(LOGIN_URL).send({ username: 'admin', password: 'admin' });
+  // userToken = response.body.accessToken;
+});
 
-describe('Product Routes', () => {
-  beforeEach(() => {
-    jest.clearAllMocks(); // Clear mock calls after each test
+describe('Products Test', () => {
+  let id;
 
-    // Mock token verification
-    jwt.verifyToken.mockReturnValueOnce({
-      userId: 1,
-      cartId: 1,
-      username: 'admin',
-      role: 'admin',
-      iat: 1715447961,
-    });
+  it('Get Data', async () => {
+    const response = await request(app)
+      .get(BASE_API_URL)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .query({ page: 1, limit: 5 });
+
+    // const { products, pagination } = response.body.data;
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body).toHaveProperty('message', 'ok');
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveProperty('products');
+    expect(response.body.data).toHaveProperty('pagination');
   });
 
-  describe('GET /api/products', () => {
-    it('should return all products', async () => {
-      // Mock the authentication middleware
-      AuthService.findUserById.mockResolvedValueOnce({
-        id: 1,
-        username: 'admin',
-        role: 'admin',
-      });
+  it('Create Product', async () => {
+    const name = `name${+new Date()}`;
+    const response = await request(app)
+      .post(BASE_API_URL)
+      .send({
+        name,
+        description: 'Some description',
+        price: 1234,
+        imageUrl: 'imageUrl',
+      })
+      .set('Authorization', `Bearer ${adminToken}`);
 
-      // Mock the ProductService.getAll function
-      ProductService.getAll.mockResolvedValue(['Product 1', 'Product 2']);
-
-      const response = await request(app).get('/api/products').set('Authorization', 'Bearer token');
-
-      expect(response.status).toBe(200);
-      expect(ProductService.getAll).toHaveBeenCalledTimes(1);
-    });
+    const { product } = response.body.data;
+    id = product.id;
+    expect(response.status).toBe(200);
+    expect(product).toHaveProperty('name', name);
   });
 
-  describe('GET /api/products/:id', () => {
-    it('should return a product by id', async () => {
-      // Mock the authentication middleware
-      AuthService.findUserById.mockResolvedValueOnce({
-        id: 1,
-        username: 'admin',
-        role: 'admin',
-      });
+  it('Update Product', async () => {
+    const name = `edited-name${+new Date()}`;
+    const response = await request(app)
+      .put(`${BASE_API_URL}/${id}`)
+      .send({
+        id,
+        name,
+        description: 'Some description',
+        price: 4321,
+        imageUrl: 'editImageUrl',
+      })
+      .set('Authorization', `Bearer ${adminToken}`);
 
-      // Mock the ProductService.getDetail function
-      const productId = 1;
-      ProductService.getDetail.mockResolvedValue({ id: productId, name: 'Product 1' });
+    const { product } = response.body.data;
 
-      const response = await request(app)
-        .get(`/api/products/${productId}`)
-        .set('Authorization', 'Bearer token');
-
-      expect(response.status).toBe(200);
-      // expect(response.body).toEqual({
-      //   data: { id: 1, name: 'Product 1' },
-      //   message: 'Products retrieved successfully',
-      //   status: 'success',
-      // });
-      expect(ProductService.getDetail).toHaveBeenCalledWith('1');
-    });
+    expect(response.status).toBe(200);
+    expect(product).toHaveProperty('name', name);
+    expect(product).toHaveProperty('description', 'Some description');
+    expect(product).toHaveProperty('price', 4321);
+    expect(product).toHaveProperty('imageUrl', 'editImageUrl');
   });
 
-  describe('POST /api/products', () => {
-    it('should add a new product', async () => {
-      // Mock the authentication middleware
-      AuthService.findUserById.mockResolvedValueOnce({
-        id: 1,
-        username: 'admin',
-        role: 'admin',
-      });
+  it('Delete Product', async () => {
+    const name = `edited-name${+new Date()}`;
+    const response = await request(app)
+      .delete(`${BASE_API_URL}/${id}`)
+      .send({
+        id,
+        name,
+        description: 'Some description',
+        price: 4321,
+        imageUrl: 'editImageUrl',
+      })
+      .set('Authorization', `Bearer ${adminToken}`);
 
-      const productData = { name: 'New Product', price: 10 };
+    const { product } = response.body.data;
 
-      // Mock the ProductService.add function
-      ProductService.add.mockResolvedValue(productData);
-
-      const response = await request(app)
-        .post('/api/products')
-        .set('Authorization', 'Bearer token')
-        .send(productData);
-
-      expect(response.status).toBe(200);
-      expect(ProductService.add).toHaveBeenCalledWith(productData);
-    });
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body).toHaveProperty('message', 'Products deleted successfully!');
+    expect(response.body).toHaveProperty('data');
+    expect(product.id).toBe(id);
   });
-
-  // Add other test cases for remaining routes as needed
 });
