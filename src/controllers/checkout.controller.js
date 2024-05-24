@@ -96,8 +96,8 @@ class CheckoutController {
 
   static async action(req, res, next) {
     try {
-      const productCheckout = await CheckoutService.action(req.body);
-      res.status(200).json(successResponse(productCheckout, 'Checkout executed successfully'));
+      const checkout = await CheckoutService.action(req.body);
+      res.status(200).json(successResponse({ checkout }, 'Checkout executed successfully'));
     } catch (e) {
       next(e);
     }
