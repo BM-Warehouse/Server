@@ -5,7 +5,7 @@ name: Testing with Jest
 
 on:
   push:
-    branches: [ "main", "feat/github-flow" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
