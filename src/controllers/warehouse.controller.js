@@ -80,10 +80,24 @@ class WarehouseController {
 
   static async getWarehouseDetail(req, res, next) {
     try {
+      let { page, limit } = req.query;
+
+      page = +page || DEFAULT_PAGE;
+      limit = +limit || DEFAULT_LIMIT;
+
+      const filter = {
+        page,
+        limit,
+      };
+
       const { id } = req.params;
-      const warehouse = await WarehouseService.getWarehouseDetail(id);
+
+      const warehouse = await WarehouseService.getWarehouseDetail(id, filter);
+      const pagination = getPaginationStatus(page, limit, warehouse.count);
       // res.status(200).json(warehouse);
-      res.status(200).json(successResponse({ warehouse }, 'Warehouse data successfully retrieved'));
+      res
+        .status(200)
+        .json(successResponse({ warehouse, pagination }, 'Warehouse data successfully retrieved'));
     } catch (e) {
       next(e);
     }
@@ -132,6 +146,17 @@ class WarehouseController {
     try {
       const warehouse = await WarehouseService.productsWarehouse();
       res.status(200).json(warehouse);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async deleteProductFromWarehouse(req, res, next) {
+    try {
+      const { id } = req.params;
+      await WarehouseService.deleteProductFromWarehouse(id);
+      // res.status(200).json({ message: 'Warehouse Deleted Successfully!' });
+      res.status(200).json(successResponse('Product Deleted From Warehouse Successfully!'));
     } catch (e) {
       next(e);
     }
