@@ -1,4 +1,4 @@
-name: check linter and unit tests
+name: check linter
 
 on:
   pull_request:
