@@ -8,6 +8,7 @@ const warehouseRoute = require('@routes/warehouse.route');
 const cartRoute = require('@routes/cart.route');
 const courierRoute = require('@routes/courier.route');
 const recaptchaRouter = require('@routes/recapthca.route');
+const batchRouter = require('@routes/batch.route');
 const { authentication } = require('@middlewares/auth');
 
 /****** Koleksi Route disini *******/
@@ -21,5 +22,6 @@ router.use('/api/checkout', checkoutRoute);
 router.use('/api/warehouses', warehouseRoute);
 router.use('/api/cart', cartRoute);
 router.use('/api/couriers', courierRoute);
+router.use('/api/batch', batchRouter);
 
 module.exports = router;

@@ -4,6 +4,8 @@
 
 [![check linter and unit tests](https://github.com/BM-Warehouse/Server/actions/workflows/lintCheck.yml/badge.svg)](https://github.com/BM-Warehouse/Server/actions/workflows/lintCheck.yml)
 
+[![Testing with Jest](https://github.com/BM-Warehouse/Server/actions/workflows/test.yml/badge.svg)](https://github.com/BM-Warehouse/Server/actions/workflows/test.yml)
+
 1. Clone the repository
 2. Make sure you have `Node.js v20.10.0` installed
 3. Make sure you have `pnpm` installed
