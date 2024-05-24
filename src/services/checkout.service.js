@@ -351,12 +351,12 @@ class CheckoutService {
           },
         });
 
-        const productCheckout = tx.productCheckout.findMany({
-          where: {
-            checkoutId: checkout.id,
-          },
-        });
-        return productCheckout;
+        // const productCheckout = tx.productCheckout.findMany({
+        //   where: {
+        //     checkoutId: checkout.id,
+        //   },
+        // });
+        return checkout;
       });
 
       return count;
