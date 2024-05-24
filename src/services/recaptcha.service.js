@@ -15,7 +15,6 @@ class RecaptchaService {
 
       return data.success;
     } catch (error) {
-      console.error('Error verifying reCAPTCHA', error);
       throw new InternalServerError(
         'reCAPTCHA verification failed',
         `An error occurred while verifying reCAPTCHA: ${error.message}`,
