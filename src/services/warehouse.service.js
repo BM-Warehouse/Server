@@ -110,14 +110,18 @@ class WarehouseService {
     }
   }
 
-  static async getWarehouseDetail(id) {
+  static async getWarehouseDetail(id, filter) {
     try {
       const warehouse = await prisma.warehouse.findMany({
+        skip: (filter.page - 1) * filter.limit,
+        take: filter.limit,
         where: {
           id: +id,
         },
         include: {
           productsWarehouses: {
+            skip: (filter.page - 1) * filter.limit,
+            take: filter.limit,
             select: {
               quantity: true,
               product: {
@@ -131,10 +135,18 @@ class WarehouseService {
         },
       });
 
+      const count = await prisma.productWarehouse.count({
+        where: {
+          warehouseId: +id,
+        },
+      });
+
+      warehouse.productsWarehousesCount = count;
+
       if (!warehouse) {
         throw new NotFoundError('Cannot find warehouse with that ID!');
       }
-      return warehouse;
+      return { warehouse, count };
     } catch (e) {
       throw new e();
     }
@@ -200,6 +212,19 @@ class WarehouseService {
         warehouseId: warehouse.warehouseId,
         totalQuantity: warehouse._sum.quantity,
       }));
+    } catch (e) {
+      throw new e();
+    }
+  }
+
+  static async deleteProductFromWarehouse(productId, warehouseId) {
+    try {
+      await prisma.productWarehouse.delete({
+        where: {
+          productId: +productId,
+          warehouseId: +warehouseId,
+        },
+      });
     } catch (e) {
       throw new e();
     }
