@@ -40,6 +40,20 @@ for(let j = 1; j <= 10; j++){ //warehouseId
     batchId++;
 }
 
+// agar pasti ada yang expired untuk testing
+for(let j = 1; j <= 10; j++){ //warehouseId
+    for(let i = 1; i <= 50; i++){ //productId
+        batches.push({
+            productId: i,
+            warehouseId: j,
+            batchName: `batch${batchId}`,
+            stock: 1000,
+            expireDate: new Date('2000-01-01')
+        });
+    }
+    batchId++;
+}
+
 async function seedBatches() {
     try{
         await prisma.batch.createMany({
