@@ -106,7 +106,7 @@ class CategoryService {
 
   static async editCategory(id, name, description, imageUrl) {
     try {
-      if (!id || !name || !description || !imageUrl) {
+      if (!id && !name && !description && !imageUrl) {
         throw new BadRequest(
           'Input is invalid',
           'Id, name, description, and image should not be empty!',

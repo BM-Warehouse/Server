@@ -96,4 +96,16 @@ describe('Products Test', () => {
     expect(response.body).toHaveProperty('data');
     expect(product.id).toBe(id);
   });
+
+  it('Check Expired Product', async () => {
+    const response = await request(app)
+      .get(`${BASE_API_URL}/expired`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    const { batches } = response.body.data;
+
+    expect(response.status).toBe(200);
+    expect(batches).toBeInstanceOf(Array);
+    expect(batches).not.toHaveLength(0);
+  });
 });
