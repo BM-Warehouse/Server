@@ -33,7 +33,7 @@ class CategoryController {
 
   static async addCategory(req, res, next) {
     try {
-      const { newCategory } = await CategoryService.addCategory(req.body);
+      const newCategory = await CategoryService.addCategory(req.body);
       res.status(201).json(successResponse(newCategory, 'category added successfully'));
     } catch (e) {
       next(e);
@@ -44,12 +44,7 @@ class CategoryController {
     try {
       const { id } = req.params;
       const { name, description, imageUrl } = req.body;
-      const { editedCategory } = await CategoryService.editCategory(
-        id,
-        name,
-        description,
-        imageUrl,
-      );
+      const editedCategory = await CategoryService.editCategory(id, name, description, imageUrl);
       res.status(200).json(successResponse(editedCategory, 'category edited successfully'));
     } catch (e) {
       next(e);
