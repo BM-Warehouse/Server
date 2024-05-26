@@ -34,12 +34,6 @@ class CategoryService {
         take: limit,
         orderBy: orderInfo,
       });
-      if (!categories[0]) {
-        throw new NotFoundError(
-          'Categories not found',
-          `Categories contained '${contains}' are not available`,
-        );
-      }
       const count = await prisma.category.count({
         where,
       });
