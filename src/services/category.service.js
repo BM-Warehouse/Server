@@ -34,12 +34,6 @@ class CategoryService {
         take: limit,
         orderBy: orderInfo,
       });
-      if (!categories[0]) {
-        throw new NotFoundError(
-          'Categories not found',
-          `Categories contained '${contains}' are not available`,
-        );
-      }
       const count = await prisma.category.count({
         where,
       });
@@ -93,7 +87,7 @@ class CategoryService {
             imageUrl,
           },
         });
-        return newCategory;
+        return { newCategory };
       }
     } catch (e) {
       if (!(e instanceof ClientError)) {
@@ -122,7 +116,7 @@ class CategoryService {
           imageUrl,
         },
       });
-      return editedCategory;
+      return { editedCategory };
     } catch (e) {
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to edit category from db', e.message);
@@ -147,7 +141,7 @@ class CategoryService {
             id: +id,
           },
         });
-        return removed;
+        return { removed };
       }
     } catch (e) {
       if (!(e instanceof ClientError)) {
