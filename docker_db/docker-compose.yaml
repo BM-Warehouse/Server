@@ -8,9 +8,9 @@ services:
     image: postgres:alpine3.20
     container_name: "pg_bmwarehouse"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=12345678
-      - POSTGRES_DB=bmwarehouse
+      - POSTGRES_USER=    
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=
     restart: always
     ports:
       - 5433:5432
