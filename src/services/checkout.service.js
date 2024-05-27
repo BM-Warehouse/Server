@@ -118,6 +118,7 @@ class CheckoutService {
             skip: (page - 1) * limit,
             take: limit,
           },
+          couriers: true,
         },
       });
 
@@ -166,6 +167,7 @@ class CheckoutService {
           courierId: +courierId,
           status,
           totalPrice: courier.price,
+          totalProductPrice: 0,
         },
       });
 
@@ -590,6 +592,9 @@ class CheckoutService {
             totalPrice: {
               increment: +payload.quantity * product.price,
             },
+            totalProductPrice: {
+              increment: +payload.quantity * product.price,
+            },
           },
         });
 
@@ -649,6 +654,9 @@ class CheckoutService {
           },
           data: {
             totalPrice: {
+              increment: (+payload.quantity - productCheckout.quantityItem) * product.price,
+            },
+            totalProductPrice: {
               increment: (+payload.quantity - productCheckout.quantityItem) * product.price,
             },
           },
@@ -724,6 +732,9 @@ class CheckoutService {
           },
           data: {
             totalPrice: {
+              decrement: productCheckout.productPrice,
+            },
+            totalProductPrice: {
               decrement: productCheckout.productPrice,
             },
           },
