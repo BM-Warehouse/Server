@@ -321,13 +321,13 @@ class ProductService {
       }
       const product = await prisma.product.findFirst({
         where: {
-          id: productId,
+          id: +productId,
         },
       });
 
       const warehouse = await prisma.warehouse.findFirst({
         where: {
-          id: warehouseId,
+          id: +warehouseId,
         },
       });
 
@@ -403,11 +403,12 @@ class ProductService {
       let product = null;
       let warehouseSource = null;
       let warehouseDestination = null;
-      const {
-        productId,
-        warehouseId: { from, to },
-        quantity,
-      } = payload;
+
+      const productId = +payload.productId;
+      const quantity = +payload.quantity;
+      const from = +payload.warehouseId.from;
+      const to = +payload.warehouseId.to;
+
       // ------ validation ---------- //
       if (!productId || !to || !from) {
         throw new BadRequest(
