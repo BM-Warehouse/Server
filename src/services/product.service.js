@@ -320,13 +320,13 @@ class ProductService {
       }
       const product = await prisma.product.findFirst({
         where: {
-          id: productId,
+          id: +productId,
         },
       });
 
       const warehouse = await prisma.warehouse.findFirst({
         where: {
-          id: warehouseId,
+          id: +warehouseId,
         },
       });
 
