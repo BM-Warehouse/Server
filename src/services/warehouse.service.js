@@ -113,8 +113,6 @@ class WarehouseService {
   static async getWarehouseDetail(id, filter) {
     try {
       const warehouse = await prisma.warehouse.findMany({
-        skip: (filter.page - 1) * filter.limit,
-        take: filter.limit,
         where: {
           id: +id,
         },
