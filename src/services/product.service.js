@@ -155,7 +155,6 @@ class ProductService {
 
       return products;
     } catch (e) {
-      console.log(e);
       if (!(e instanceof ClientError)) {
         throw new InternalServerError('Fail to get detail of product', e.message);
       } else {

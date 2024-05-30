@@ -98,9 +98,10 @@ class UserController {
   static async updateUser(req, res, next) {
     try {
       const { id } = req.params;
-      const { username, password, fullName, phone, address, gender, birthdate, avatar, role } =
+      const { username, password, email, name, phone, address, gender, birthdate, avatar, role } =
         req.body;
-      const hashPass = hashPassword(password);
+
+      const hashPass = password ? hashPassword(password) : null;
 
       if (id && isNaN(id)) {
         throw new BadRequest('Invalid key parameter', 'ID must be a valid number');
@@ -110,7 +111,8 @@ class UserController {
         id,
         username,
         hashPass,
-        fullName,
+        name,
+        email,
         phone,
         address,
         gender,

@@ -7,6 +7,13 @@ const {
 } = require('@exceptions/error.excecptions');
 
 class UserService {
+  static filterUndefinedAndNull = (obj) => {
+    return Object.fromEntries(
+      // eslint-disable-next-line no-unused-vars
+      Object.entries(obj).filter(([_, v]) => v !== undefined && v !== null),
+    );
+  };
+
   static async getAllUsers({ page, limit, orderType, orderBy, contains }) {
     let where = {};
     let orderInfo;
@@ -172,6 +179,7 @@ class UserService {
     username,
     password,
     fullName,
+    email,
     phone,
     address,
     gender,
@@ -186,21 +194,24 @@ class UserService {
         throw new NotFoundError('User not found', `No user was found with the ID: ${id}`);
       }
 
+      const data = this.filterUndefinedAndNull({
+        username,
+        password,
+        fullName,
+        email,
+        phone,
+        address,
+        gender,
+        birthdate: new Date(birthdate),
+        avatar,
+        role,
+      });
+
       const user = await prisma.user.update({
         where: {
           id: +id,
         },
-        data: {
-          username,
-          password,
-          fullName,
-          phone,
-          address,
-          gender,
-          birthdate: new Date(birthdate),
-          avatar,
-          role,
-        },
+        data,
       });
 
       if (!user) {
