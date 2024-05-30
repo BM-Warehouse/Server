@@ -18,9 +18,20 @@ class ProductService {
     return expireDate;
   }
 
-  static async getAll(payload) {
-    const { page, limit, categoryId, warehouseId, minPrice, maxPrice, contains } = payload;
-    let where = { price: {} };
+  static async getAll({
+    page,
+    limit,
+    orderType,
+    orderBy,
+    contains,
+    categoryId,
+    warehouseId,
+    minPrice,
+    maxPrice,
+  }) {
+    let where = {};
+    let orderInfo;
+    const ORDER_TYPE_DEFAULT = 'asc';
 
     if (contains) {
       where.name = {
@@ -54,6 +65,19 @@ class ProductService {
         gte: +minPrice,
       };
     }
+    if (orderBy === 'id') {
+      orderInfo = {
+        id: orderType || ORDER_TYPE_DEFAULT,
+      };
+    } else if (orderBy === 'name') {
+      orderInfo = {
+        name: orderType || ORDER_TYPE_DEFAULT,
+      };
+    } else if (orderBy === 'price') {
+      orderInfo = {
+        price: orderType || ORDER_TYPE_DEFAULT,
+      };
+    }
 
     try {
       const products = await prisma.product.findMany({
@@ -83,6 +107,7 @@ class ProductService {
         },
         skip: (page - 1) * limit,
         take: limit,
+        orderBy: orderInfo,
       });
 
       const count = await prisma.product.count({

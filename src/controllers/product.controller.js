@@ -9,17 +9,23 @@ const DEFAULT_PAGE = 1;
 class ProductController {
   static async getAll(req, res, next) {
     try {
-      let filter = req.query;
+      let { page, limit } = req.query;
 
-      if ((filter.page && isNaN(filter.page)) || (filter.limit && isNaN(filter.limit))) {
+      if ((page && isNaN(page)) || (limit && isNaN(limit))) {
         throw new BadRequest('Query parameter error', 'limit and page have to be a number');
       }
 
-      filter.page = +filter.page || DEFAULT_PAGE;
-      filter.limit = +filter.limit || DEFAULT_LIMIT;
+      page = +page || DEFAULT_PAGE;
+      limit = +limit || DEFAULT_LIMIT;
 
-      const { products, count } = await ProductService.getAll(filter);
-      const pagination = getPaginationStatus(filter.page, filter.limit, count);
+      req.query = {
+        ...req.query,
+        page,
+        limit,
+      };
+
+      const { products, count } = await ProductService.getAll(req.query);
+      const pagination = getPaginationStatus(page, limit, count);
       res.status(200).json(successResponse({ products, pagination }, 'ok'));
     } catch (e) {
       next(e);
