@@ -119,6 +119,7 @@ class CheckoutService {
             take: limit,
           },
           couriers: true,
+          user: true,
         },
       });
 
@@ -182,7 +183,7 @@ class CheckoutService {
   }
   static async update(id, payload) {
     try {
-      const { method, address, courierId } = payload;
+      const { userId, method, address, courierId } = payload;
 
       let checkout = await prisma.checkout.findFirst({
         where: {
@@ -193,6 +194,18 @@ class CheckoutService {
         },
       });
 
+      if (!checkout) {
+        throw new NotFoundError('No Checkout found', `There is no checkout with id ${id}`);
+      }
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: +userId,
+        },
+      });
+
+      if (!user) throw new NotFoundError(`No User with id ${userId}`);
+
       const courier = await prisma.courier.findUnique({
         where: {
           id: +courierId,
@@ -200,10 +213,6 @@ class CheckoutService {
       });
 
       const dPrice = courier.price - checkout.couriers.price;
-
-      if (!checkout) {
-        throw new NotFoundError('No Checkout found', `There is no checkout with id ${id}`);
-      }
 
       checkout = await prisma.checkout.update({
         where: {
@@ -215,7 +224,8 @@ class CheckoutService {
           },
           method,
           address,
-          courierId,
+          courierId: +courierId,
+          userId: +userId,
         },
       });
 
