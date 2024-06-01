@@ -14,6 +14,9 @@ router.delete('/:id', ProductController.delete);
 router.post('/warehouse/add', ProductController.addToWarehouse);
 router.post('/warehouse/move', ProductController.moveWarehouse);
 router.post('/damage', ProductController.damage);
-router.delete('/warehouse-products/:productId', ProductController.deleteProductWarehouse);
+router.delete(
+  '/:warehouseId/warehouse-products/:productId',
+  ProductController.deleteProductWarehouse,
+);
 
 module.exports = router;
