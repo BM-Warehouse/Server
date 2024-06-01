@@ -656,6 +656,37 @@ class ProductService {
       }
     }
   }
+
+  static async deleteProductFromWarehouse(warehouseId, productId) {
+    const product = await prisma.product.findUnique({
+      where: {
+        id: +productId,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundError('Product not found', `No product found with id ${productId}`);
+    }
+
+    const warehouse = await prisma.warehouse.findUnique({
+      where: {
+        id: +warehouseId,
+      },
+    });
+
+    if (!warehouse) {
+      throw new NotFoundError('Warehouse not found', `No warehouse found with id ${warehouseId}`);
+    }
+
+    await prisma.productWarehouse.delete({
+      where: {
+        warehouseId_productId: {
+          warehouseId: +warehouseId,
+          productId: +productId,
+        },
+      },
+    });
+  }
 }
 
 module.exports = ProductService;

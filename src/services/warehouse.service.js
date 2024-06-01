@@ -214,19 +214,6 @@ class WarehouseService {
       throw new e();
     }
   }
-
-  static async deleteProductFromWarehouse(productId, warehouseId) {
-    try {
-      await prisma.productWarehouse.delete({
-        where: {
-          productId: +productId,
-          warehouseId: +warehouseId,
-        },
-      });
-    } catch (e) {
-      throw new e();
-    }
-  }
 }
 
 module.exports = WarehouseService;
