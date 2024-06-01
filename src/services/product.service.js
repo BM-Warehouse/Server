@@ -678,14 +678,14 @@ class ProductService {
       throw new NotFoundError('Warehouse not found', `No warehouse found with id ${warehouseId}`);
     }
 
-    await prisma.productWarehouse.delete({
+    const warehouseProduct = await prisma.warehouseProduct.deleteMany({
       where: {
-        warehouseId_productId: {
-          warehouseId: +warehouseId,
-          productId: +productId,
-        },
+        warehouseId: +warehouseId,
+        productId: +productId,
       },
     });
+
+    return warehouseProduct;
   }
 }
 
