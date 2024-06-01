@@ -1,4 +1,5 @@
 const WarehouseService = require('@services/warehouse.service');
+const { BadRequest } = require('@src/exceptions/error.excecptions');
 const { getPaginationStatus } = require('@src/libs/pagination');
 const { successResponse } = require('@src/responses/responses');
 
@@ -52,19 +53,27 @@ class WarehouseController {
     }
   }
 
+  // warehouse.controller.js
+
   static async getBatch(req, res, next) {
     try {
-      let { page, limit } = req.query;
+      const { productId, warehouseId, page = 1, limit = 10 } = req.query;
 
-      page = +page || DEFAULT_PAGE;
-      limit = +limit || DEFAULT_LIMIT;
+      if (!productId || !warehouseId) {
+        throw new BadRequest('Parameter Error', 'productId and warehouseId must be supplied');
+      }
 
       const filter = {
-        page,
-        limit,
+        page: +page,
+        limit: +limit,
       };
 
-      const batches = await WarehouseService.getBatch(req.body, filter);
+      const payload = {
+        productId: +productId,
+        warehouseId: +warehouseId,
+      };
+
+      const batches = await WarehouseService.getBatch(payload, filter);
 
       const pagination = getPaginationStatus(page, limit, batches.count);
 
@@ -146,17 +155,6 @@ class WarehouseController {
     try {
       const warehouse = await WarehouseService.productsWarehouse();
       res.status(200).json(warehouse);
-    } catch (e) {
-      next(e);
-    }
-  }
-
-  static async deleteProductFromWarehouse(req, res, next) {
-    try {
-      const { id } = req.params;
-      await WarehouseService.deleteProductFromWarehouse(id);
-      // res.status(200).json({ message: 'Warehouse Deleted Successfully!' });
-      res.status(200).json(successResponse('Product Deleted From Warehouse Successfully!'));
     } catch (e) {
       next(e);
     }

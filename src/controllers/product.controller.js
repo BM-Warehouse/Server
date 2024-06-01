@@ -144,6 +144,21 @@ class ProductController {
       next(e);
     }
   }
+
+  static async deleteProductWarehouse(req, res, next) {
+    try {
+      const { warehouseId, productId } = req.params;
+
+      if (isNaN(warehouseId) || isNaN(productId)) {
+        throw new BadRequest('Parameter Error', 'warehouseId and productId must be numbers');
+      }
+
+      await ProductService.deleteProductFromWarehouse(+warehouseId, +productId);
+      res.status(200).json(successResponse({}, 'Product successfully removed from warehouse'));
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = ProductController;
