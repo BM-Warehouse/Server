@@ -119,6 +119,7 @@ class CheckoutService {
             take: limit,
           },
           couriers: true,
+          user: true,
         },
       });
 
